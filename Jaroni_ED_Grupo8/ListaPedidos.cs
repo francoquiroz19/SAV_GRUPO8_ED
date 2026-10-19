@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace JaroniApp
+namespace Jaroni_ED_Grupo8
 {
     // REPRESENTA CADA NODO DE LA LISTA DE PEDIDOS
     public class NodoPedido
@@ -18,6 +18,8 @@ namespace JaroniApp
             Anterior = null;
         }
     }
+
+
 
     // ADMINISTRA LOS PEDIDOS MEDIANTE UNA LISTA DOBLEMENTE ENLAZADA
     public class ListaPedidos
@@ -116,5 +118,11 @@ namespace JaroniApp
                 actual = actual.Anterior;
             }
         }
+        public NodoPedido ObtenerCabeza()
+        {
+            return cabeza;
+        }
+
     }
+
 }

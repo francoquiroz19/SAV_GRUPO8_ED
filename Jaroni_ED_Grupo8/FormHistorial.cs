@@ -1,6 +1,6 @@
 ﻿
-namespace JaroniApp
-{
+namespace Jaroni_ED_Grupo8
+{ 
     // Formulario que permite registrar y consultar el historial de acciones
     public class FormHistorial : Form
     {

@@ -14,7 +14,7 @@ namespace Jaroni_ED_Grupo8
             ApplicationConfiguration.Initialize();
 
             // Abre el formulario del historial de acciones
-            Application.Run(new JaroniApp.FormHistorial());
+            Application.Run(new Jaroni_ED_Grupo8.FormPedidos());
         }
     }
 }
