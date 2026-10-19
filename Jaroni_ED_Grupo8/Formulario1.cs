@@ -1,6 +1,6 @@
 namespace Jaroni_ED_Grupo8
 {
-    internal static class Program
+    internal static class Formulario1
     {
         /// <summary>
         ///  The main entry point for the application.
