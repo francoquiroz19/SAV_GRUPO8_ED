@@ -1,5 +1,6 @@
-﻿namespace JaroniApp
+﻿namespace Jaroni_ED_Grupo8
 {
+
     // Clase modelo que almacena la información de un cliente
     public class Cliente
     {

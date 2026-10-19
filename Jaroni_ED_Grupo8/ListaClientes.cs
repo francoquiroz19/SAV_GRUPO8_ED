@@ -1,4 +1,4 @@
-﻿namespace JaroniApp
+﻿namespace Jaroni_ED_Grupo8
 {
     // Clase que representa cada nodo de la lista de clientes
     public class NodoCliente

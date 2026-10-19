@@ -1,6 +1,6 @@
 ﻿namespace Jaroni_ED_Grupo8
 {
-    partial class Form1
+    partial class FormPedidos
     {
         /// <summary>
         ///  Required designer variable.

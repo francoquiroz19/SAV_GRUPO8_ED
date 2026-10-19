@@ -1,5 +1,5 @@
 ﻿
-namespace JaroniApp
+namespace Jaroni_ED_Grupo8
 {
     // almacena la información de una acción realizada
     public class Accion
