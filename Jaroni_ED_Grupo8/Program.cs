@@ -1,15 +1,16 @@
+
 namespace Jaroni_ED_Grupo8
 {
+    // Clase principal que permite iniciar el programa
     internal static class Program
     {
-        /// <summary>
-        ///  The main entry point for the application.
-        /// </summary>
+        // Indica cómo se ejecutará el programa
         [STAThread]
+
+        // Método principal donde comienza la ejecución
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
+            // Inicializa la configuración de Windows Forms
             ApplicationConfiguration.Initialize();
             Application.Run(new FormProductos());
         }
