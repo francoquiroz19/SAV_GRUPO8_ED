@@ -1,5 +1,6 @@
-﻿namespace JaroniApp
+﻿namespace Jaroni_ED_Grupo8
 {
+
     // Formulario que permite registrar, consultar, actualizar y eliminar clientes
     public class FormClientes : Form
     {

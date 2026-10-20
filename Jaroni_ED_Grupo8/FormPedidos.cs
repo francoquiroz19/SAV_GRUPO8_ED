@@ -1,4 +1,4 @@
-﻿
+ï»¿
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -14,7 +14,7 @@ namespace JaroniApp
 
         public FormPedidos()
         {
-            Text = "Gestión de pedidos";
+            Text = "GestiÃ³n de pedidos";
             Size = new Size(750, 500);
             StartPosition = FormStartPosition.CenterScreen;
 

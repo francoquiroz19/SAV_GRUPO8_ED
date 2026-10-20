@@ -1,7 +1,7 @@
 ﻿
 using System;
 
-namespace JaroniApp
+namespace Jaroni_ED_Grupo8
 {
     // CONTIENE LOS DATOS DE UN PEDIDO
     public class Pedido

@@ -1,5 +1,5 @@
 ﻿
-namespace JaroniApp
+namespace Jaroni_ED_Grupo8
 {
     // Clase que representa un nodo de la pila
     public class NodoAccion

@@ -1,4 +1,6 @@
-﻿namespace Jaroni_ED_Grupo8
+﻿using System;
+
+namespace Jaroni_ED_Grupo8
 {
     public class Producto
     {

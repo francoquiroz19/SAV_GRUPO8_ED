@@ -1,9 +1,18 @@
-﻿namespace Jaroni_ED_Grupo8
+﻿using System;
+using System.Windows.Forms;
+namespace Jaroni_ED_Grupo8
 {
     partial class FormProductos
     {
+        /// <summary>
+        /// Variable del diseñador necesaria.
+        /// </summary>
         private System.ComponentModel.IContainer components = null;
 
+        /// <summary>
+        /// Limpiar los recursos que se estén usando.
+        /// </summary>
+        /// <param name="disposing">true si los recursos administrados se deben desechar; false en caso contrario.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -15,6 +24,10 @@
 
         #region Código generado por el Diseñador de Windows Forms
 
+        /// <summary>
+        /// Método necesario para admitir el Diseñador. No se puede modificar
+        /// el contenido de este método con el editor de código.
+        /// </summary>
         private void InitializeComponent()
         {
             this.lblCodigo = new System.Windows.Forms.Label();
@@ -29,6 +42,7 @@
             this.txtPrecio = new System.Windows.Forms.TextBox();
             this.lblUbicacion = new System.Windows.Forms.Label();
             this.txtUbicacion = new System.Windows.Forms.TextBox();
+
             this.btnRegistrar = new System.Windows.Forms.Button();
             this.btnBuscar = new System.Windows.Forms.Button();
             this.btnActualizar = new System.Windows.Forms.Button();
@@ -37,6 +51,7 @@
             this.btnSalida = new System.Windows.Forms.Button();
             this.btnBajoStock = new System.Windows.Forms.Button();
             this.btnMostrarTodos = new System.Windows.Forms.Button();
+
             this.dgvInventario = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventario)).BeginInit();
             this.SuspendLayout();
