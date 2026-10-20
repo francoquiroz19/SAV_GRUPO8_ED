@@ -14,15 +14,18 @@ namespace Jaroni_ED_Grupo8
         }
     }
 
+    // Guarda las ventas pendientes en nodos enlazados según el principio LIFO.
     public sealed class PilaHistorial
     {
         // El tope es el último registro agregado. LIFO: último en entrar, primero en salir.
         private NodoPilaVenta? tope;
         private int cantidad;
 
+        // Sin tope no hay registros pendientes.
         public bool EstaVacia => tope is null;
         public int Longitud => cantidad;
 
+        // Coloca la venta más reciente encima del tope anterior.
         public void Push(VentaHistorialDemo venta)
         {
             // Primero enlazamos el nuevo nodo al antiguo tope; luego pasa a ser la cima.
@@ -32,6 +35,7 @@ namespace Jaroni_ED_Grupo8
             cantidad++;
         }
 
+        // Retira únicamente el tope: el último registro en entrar sale primero.
         public VentaHistorialDemo Pop()
         {
             if (tope is null)
@@ -44,6 +48,7 @@ namespace Jaroni_ED_Grupo8
             return retirada;
         }
 
+        // Lee el tope sin cambiar los enlaces ni la longitud.
         public VentaHistorialDemo Top()
         {
             if (tope is null)
@@ -53,6 +58,7 @@ namespace Jaroni_ED_Grupo8
             return tope.Dato;
         }
 
+        // Suelta todos los nodos y reinicia el contador.
         public void Clear()
         {
             tope = null;

@@ -10,7 +10,7 @@
 
   <!-- Conserva el archivo de trabajo sin compilar dos clases ListaProductos iguales. -->
   <ItemGroup>
-    <Compile Remove="ListaProducto.cs" />
+    <Compile Remove="Productos/ListaProducto.cs" />
   </ItemGroup>
 
 </Project>

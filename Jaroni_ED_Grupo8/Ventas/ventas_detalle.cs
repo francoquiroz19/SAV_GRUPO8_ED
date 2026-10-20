@@ -1,5 +1,6 @@
 namespace Jaroni_ED_Grupo8;
 
+// Representa un artículo agregado: producto, cantidad y precio unitario.
 public sealed class VentasDetalle
 {
     public string Codigo { get; }
@@ -16,5 +17,6 @@ public sealed class VentasDetalle
         Cantidad = cantidad;
     }
 
+    // Suma unidades del mismo producto; el subtotal se recalcula con la cantidad.
     public void Acumular(int cantidad) => Cantidad = checked(Cantidad + cantidad);
 }

@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 namespace JaroniApp
 {
+    // Recibe pedidos desde el formulario y presenta sus datos en la tabla.
     public partial class FormPedidos : Form
     {
         private readonly DataGridView tabla = new DataGridView();
@@ -14,13 +15,13 @@ namespace JaroniApp
 
         public FormPedidos()
         {
-            Text = "GestiÃ³n de pedidos";
+            Text = "JARONI | Pedidos";
             Size = new Size(750, 500);
             StartPosition = FormStartPosition.CenterScreen;
 
             var lblTitulo = new Label
             {
-                Text = "REGISTRO DE PEDIDOS",
+                Text = "PEDIDOS",
                 Font = new Font("Segoe UI", 16, FontStyle.Bold),
                 Location = new Point(20, 20),
                 AutoSize = true
@@ -64,6 +65,7 @@ namespace JaroniApp
             Controls.Add(tabla);
         }
 
+        // Prepara una etiqueta de entrada con la misma presentación del formulario.
         private Label CrearEtiqueta(string texto, int x, int y)
         {
             return new Label
@@ -74,6 +76,7 @@ namespace JaroniApp
             };
         }
 
+        // Valida los campos y agrega el pedido visible a la tabla.
         private void AgregarPedido(object? sender, EventArgs e)
         {
             string cliente = txtCliente.Text.Trim();

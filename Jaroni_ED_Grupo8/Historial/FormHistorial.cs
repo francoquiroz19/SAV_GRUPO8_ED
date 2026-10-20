@@ -5,6 +5,7 @@ using JaroniApp;
 
 namespace Jaroni_ED_Grupo8
 {
+    // Muestra las ventas pendientes almacenadas en una pila enlazada.
     public class FormHistorial : Form
     {
         private const int RegistrosIniciales = 10;
@@ -46,7 +47,7 @@ namespace Jaroni_ED_Grupo8
             });
             Controls.Add(new Label
             {
-                Text = "Revisión de ventas recientes — Pila LIFO",
+                Text = "Ventas pendientes de revisión",
                 Location = new Point(20, 47),
                 Size = new Size(420, 22)
             });
@@ -106,6 +107,7 @@ namespace Jaroni_ED_Grupo8
             Controls.Add(boton);
         }
 
+        // Carga diez registros fijos para la revisión en memoria.
         private void CargarVentasIniciales()
         {
             // Diez Push en orden cronológico: V010 termina en el tope de la pila.
@@ -122,6 +124,7 @@ namespace Jaroni_ED_Grupo8
             historial.Push(new VentaHistorialDemo("V010", new DateTime(2026, 9, 10, 9, 0, 0), "Audífonos", 1, 85.00m));
         }
 
+        // Refleja el estado de la pila en la tabla y en los indicadores.
         private void ActualizarPresentacion()
         {
             tabla.Rows.Clear();
@@ -138,6 +141,7 @@ namespace Jaroni_ED_Grupo8
             tabla.ClearSelection();
         }
 
+        // Consulta la venta superior sin retirarla.
         private void BtnVerUltima_Click(object? sender, EventArgs e)
         {
             if (historial.EstaVacia)
@@ -154,6 +158,7 @@ namespace Jaroni_ED_Grupo8
                 "Última venta pendiente", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
+        // Marca como revisada solo la venta situada en el tope.
         private void BtnRetirarUltima_Click(object? sender, EventArgs e)
         {
             if (historial.EstaVacia)
@@ -168,6 +173,7 @@ namespace Jaroni_ED_Grupo8
             lblEstado.Text = $"Venta {retirada.Codigo} revisada y retirada de pendientes.";
         }
 
+        // Vuelve a mostrar las ventas pendientes desde el tope.
         private void BtnVerPendientes_Click(object? sender, EventArgs e)
         {
             // Recorrer lee cada nodo desde el tope sin modificar la pila.
@@ -177,9 +183,10 @@ namespace Jaroni_ED_Grupo8
                 : $"Se muestran {historial.Longitud} ventas pendientes, de la más reciente a la más antigua.";
         }
 
+        // Vacía y vuelve a cargar los registros iniciales para repetir la revisión.
         private void BtnReiniciar_Click(object? sender, EventArgs e)
         {
-            if (MessageBox.Show(this, "¿Reiniciar la revisión de las 10 ventas de ejemplo?",
+            if (MessageBox.Show(this, "¿Restaurar los 10 registros iniciales y reiniciar la revisión?",
                     "Confirmar reinicio", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 

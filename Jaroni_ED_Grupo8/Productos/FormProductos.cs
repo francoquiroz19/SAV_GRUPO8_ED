@@ -3,6 +3,7 @@ using System.Windows.Forms;
 
 namespace Jaroni_ED_Grupo8
 {
+    // Permite consultar y mantener productos almacenados en la lista enlazada.
     public partial class FormProductos : Form
     {
         // Lista enlazada que almacena los productos del inventario.

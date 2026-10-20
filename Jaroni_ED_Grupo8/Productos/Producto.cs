@@ -2,6 +2,7 @@
 
 namespace Jaroni_ED_Grupo8
 {
+    // Almacena los datos de un producto y su cantidad disponible.
     public class Producto
     {
         public string Codigo { get; set; }

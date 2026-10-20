@@ -2,6 +2,7 @@ using System;
 
 namespace Jaroni_ED_Grupo8;
 
+// Almacena el detalle de venta en nodos cuyo último enlace regresa al primero.
 public sealed class VentasListaCircular<T>
 {
     // cola es null cuando no hay artículos. En otro caso apunta al último nodo.
@@ -10,6 +11,7 @@ public sealed class VentasListaCircular<T>
     // El último enlaza con el primero; por eso cola.Siguiente es la cabeza.
     public VentasNodo<T>? ObtenerCabeza() => cola?.Siguiente;
 
+    // Inserta detrás de la cola y mantiene cerrado el círculo.
     public VentasNodo<T> InsertarAlFinal(T dato)
     {
         var nuevo = new VentasNodo<T>(dato);
@@ -28,6 +30,7 @@ public sealed class VentasListaCircular<T>
         return nuevo;
     }
 
+    // Busca durante una vuelta completa sin usar la tabla como almacenamiento.
     public VentasNodo<T>? Buscar(Predicate<T> coincide)
     {
         if (cola is null) return null;
@@ -44,6 +47,7 @@ public sealed class VentasListaCircular<T>
         return null;
     }
 
+    // Desenlaza el nodo encontrado, sea único, cabeza, intermedio o cola.
     public bool Eliminar(Predicate<T> coincide)
     {
         if (cola is null) return false;
@@ -92,6 +96,7 @@ public sealed class VentasListaCircular<T>
         } while (actual != inicio);
     }
 
+    // Cuenta los nodos mediante el mismo recorrido circular.
     public int ObtenerLongitud()
     {
         var longitud = 0;
@@ -99,6 +104,7 @@ public sealed class VentasListaCircular<T>
         return longitud;
     }
 
+    // Al soltar la cola, la lista vuelve a estar vacía.
     public void Vaciar()
     {
         cola = null;

@@ -2,8 +2,10 @@
 
 namespace Jaroni_ED_Grupo8
 {
+    // Administra productos mediante una lista simplemente enlazada.
     public class ListaProductos
     {
+        // La cabeza señala el primer producto; null indica lista vacía.
         private NodoProducto cabeza;
 
         public ListaProductos()
@@ -11,6 +13,7 @@ namespace Jaroni_ED_Grupo8
             cabeza = null;
         }
 
+        // Inserta al final, después de comprobar que el código no exista.
         public bool Registrar(Producto producto)
         {
             if (Buscar(producto.Codigo) != null) return false;
@@ -25,6 +28,7 @@ namespace Jaroni_ED_Grupo8
             return true;
         }
 
+        // Recorre los enlaces hasta hallar el código solicitado.
         public Producto Buscar(string codigo)
         {
             NodoProducto actual = cabeza;
@@ -36,6 +40,7 @@ namespace Jaroni_ED_Grupo8
             return null;
         }
 
+        // Modifica los datos del producto encontrado sin reemplazar su nodo.
         public bool Actualizar(string codigo, string nuevoNombre, string nuevaCategoria, decimal nuevoPrecio, string nuevaUbicacion)
         {
             Producto p = Buscar(codigo);
@@ -50,6 +55,7 @@ namespace Jaroni_ED_Grupo8
             return false;
         }
 
+        // Desenlaza la cabeza o el nodo encontrado, conservando el resto de la lista.
         public bool Eliminar(string codigo)
         {
             if (cabeza == null) return false;
@@ -71,6 +77,7 @@ namespace Jaroni_ED_Grupo8
             return false;
         }
 
+        // Incrementa la cantidad de un producto existente.
         public bool RegistrarEntrada(string codigo, int cantidad)
         {
             Producto p = Buscar(codigo);
@@ -82,6 +89,7 @@ namespace Jaroni_ED_Grupo8
             return false;
         }
 
+        // Descuenta unidades solo cuando la cantidad disponible alcanza.
         public bool RegistrarSalida(string codigo, int cantidad)
         {
             Producto p = Buscar(codigo);
@@ -94,6 +102,7 @@ namespace Jaroni_ED_Grupo8
             return false;
         }
 
+        // Recorre los nodos y prepara una vista para el DataGridView.
         public List<Producto> ObtenerListaParaGrilla()
         {
             List<Producto> lista = new List<Producto>();
@@ -106,6 +115,7 @@ namespace Jaroni_ED_Grupo8
             return lista;
         }
 
+        // Recorre la lista y devuelve productos bajo el umbral indicado.
         public List<Producto> ObtenerBajoStock(int umbralMinimo)
         {
             List<Producto> listaBajoStock = new List<Producto>();

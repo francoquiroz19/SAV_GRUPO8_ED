@@ -1,6 +1,6 @@
 namespace JaroniApp
 {
-    // Registro ficticio de un solo producto; no representa una venta real del sistema.
+    // Registro inicial en memoria: producto, fecha, cantidad e importe calculado.
     public sealed class VentaHistorialDemo
     {
         public string Codigo { get; }
