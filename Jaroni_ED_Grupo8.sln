@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.37614.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JaroniApp", "Jaroni_ED_Grupo8\JaroniApp.csproj", "{2935282D-9053-4D9A-9834-97F7D4F94C88}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Jaroni_ED_Grupo8", "Jaroni_ED_Grupo8\Jaroni_ED_Grupo8.csproj", "{2935282D-9053-4D9A-9834-97F7D4F94C88}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

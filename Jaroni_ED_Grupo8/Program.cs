@@ -4,15 +4,11 @@ namespace Jaroni_ED_Grupo8
     // Clase principal que permite iniciar el programa
     internal static class Program
     {
-        // Indica cómo se ejecutará el programa
         [STAThread]
-
-        // Método principal donde comienza la ejecución
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-
-            Application.Run(new JaroniApp.FormHistorial());
+            Application.Run(new FormHistorial());
         }
     }
 }

@@ -1,8 +1,8 @@
 ﻿
-namespace JaroniApp
-{
+namespace Jaroni_ED_Grupo8
+{ 
     // Formulario que permite registrar y consultar el historial de acciones
-    public class FormHistorial : Form
+    public partial class FormHistorial : Form
     {
         // Pila donde se almacenan las acciones registradas
         private readonly PilaHistorial historial;
@@ -42,6 +42,7 @@ namespace JaroniApp
             // Organiza los controles y muestra el historial
             InicializarControles();
             RefrescarHistorial();
+            InicializarSeccionVentas();
         }
 
         // Método que configura los controles del formulario
