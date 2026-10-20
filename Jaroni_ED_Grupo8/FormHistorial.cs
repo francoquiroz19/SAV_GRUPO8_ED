@@ -2,7 +2,7 @@
 namespace Jaroni_ED_Grupo8
 { 
     // Formulario que permite registrar y consultar el historial de acciones
-    public partial class FormHistorial : Form
+    public class FormHistorial : Form
     {
         // Pila donde se almacenan las acciones registradas
         private readonly PilaHistorial historial;
@@ -42,7 +42,6 @@ namespace Jaroni_ED_Grupo8
             // Organiza los controles y muestra el historial
             InicializarControles();
             RefrescarHistorial();
-            InicializarSeccionVentas();
         }
 
         // Método que configura los controles del formulario
@@ -57,7 +56,7 @@ namespace Jaroni_ED_Grupo8
             cmbModulo.Location = new Point(90, 20);
             cmbModulo.Size = new Size(180, 23);
             cmbModulo.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbModulo.Items.AddRange(new object[] { "Productos", "Pedidos", "Clientes", "Proveedores", "Historial" });
+            cmbModulo.Items.AddRange(new object[] { "Productos", "Pedidos", "Clientes", "Proveedores", "Historial", "Ventas" });
             cmbModulo.SelectedIndex = 0;
 
             // Configura la etiqueta de descripción
