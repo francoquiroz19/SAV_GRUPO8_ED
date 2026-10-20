@@ -7,18 +7,19 @@ using System.Windows.Forms;
 
 namespace JaroniApp
 {
+    // Menú inicial que abre cada módulo en su propio formulario.
     public partial class FormPrincipal : Form
     {
         public FormPrincipal()
         {
             InitializeComponent();
-            Text = "Sistema de Gestión";
+            Text = "JARONI | Gestión comercial";
             Size = new Size(600, 400);
             StartPosition = FormStartPosition.CenterScreen;
 
             var titulo = new Label
             {
-                Text = "SISTEMA DE GESTIÓN",
+                Text = "JARONI",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 AutoSize = true,
                 Location = new Point(155, 35)
@@ -32,6 +33,7 @@ namespace JaroniApp
             AgregarBoton("Historial", 210, 245, AbrirHistorial);
         }
 
+        // Crea un acceso al módulo y conecta su acción de apertura.
         private void AgregarBoton(string texto, int x, int y, EventHandler accion)
         {
             var boton = new Button

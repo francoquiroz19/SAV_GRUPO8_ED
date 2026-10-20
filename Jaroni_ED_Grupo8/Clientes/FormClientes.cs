@@ -4,12 +4,12 @@
     // Formulario que permite registrar, consultar, actualizar y eliminar clientes
     public class FormClientes : Form
     {
-        // ---------- LISTA Y VARIABLES DE ESTADO ----------
+        // LISTA Y VARIABLES DE ESTADO
 
         // Lista donde se almacenan los clientes
         private readonly ListaClientes lista = new ListaClientes();
 
-        // ---------- CONTROLES DEL FORMULARIO ----------
+        // CONTROLES DEL FORMULARIO
         private readonly Label lblCodigo = new Label();
         private readonly NumericUpDown numCodigo = new NumericUpDown();
         private readonly Label lblNombre = new Label();
@@ -37,7 +37,7 @@
         public FormClientes()
         {
             // Configuramos el título, tamaño y posición del formulario
-            Text = "Gestor de Clientes (Lista Enlazada)";
+            Text = "JARONI | Clientes";
             Size = new Size(640, 560);
             StartPosition = FormStartPosition.CenterScreen;
 
@@ -47,7 +47,7 @@
             RefrescarLista();
         }
 
-        // ---------- CREACIÓN DE CONTROLES (todo en código) ----------
+        //CREACIÓN DE CONTROLES
         private void InicializarControles()
         {
             // Código del cliente
@@ -127,12 +127,12 @@
             btnLimpiar.Size = new Size(110, 30);
             btnLimpiar.Click += BtnLimpiar_Click;
 
-            btnListar.Text = "Listar Todos";
+            btnListar.Text = "Mostrar todos";
             btnListar.Location = new Point(20, 275);
             btnListar.Size = new Size(100, 30);
             btnListar.Click += BtnListar_Click;
 
-            // Lista donde se muestran los clientes (clic = cargar sus datos en los campos)
+            // Lista donde se muestran los clientes.
             lstClientes.Location = new Point(20, 320);
             lstClientes.Size = new Size(580, 150);
             lstClientes.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -167,7 +167,7 @@
             Controls.Add(lblInfo);
         }
 
-        // ---------- MÉTODOS AUXILIARES ----------
+        // MÉTODOS AUXILIARES
 
         // Agrega algunos clientes de ejemplo al iniciar
         private void CargarDatosEjemplo()
@@ -230,7 +230,7 @@
             return true;
         }
 
-        // ---------- EVENTOS DE BOTONES ----------
+        //EVENTOS DE BOTONES
 
         // Registrar un nuevo cliente
         private void BtnRegistrar_Click(object? sender, EventArgs e)
