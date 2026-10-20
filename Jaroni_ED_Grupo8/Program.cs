@@ -4,17 +4,15 @@ namespace Jaroni_ED_Grupo8
     // Clase principal que permite iniciar el programa
     internal static class Program
     {
-        // Indica cÛmo se ejecutar· el programa
+        // Indica c√≥mo se ejecutar√° el programa
         [STAThread]
 
-        // MÈtodo principal donde comienza la ejecuciÛn
+        // M√©todo principal donde comienza la ejecuci√≥n
         static void Main()
         {
-            // Inicializa la configuraciÛn de Windows Forms
+            // Inicializa la configuraci√≥n de Windows Forms
             ApplicationConfiguration.Initialize();
-
-            // Abre el formulario del historial de acciones
-            Application.Run(new Jaroni_ED_Grupo8.FormPedidos());
+            Application.Run(new FormProductos());
         }
     }
 }
