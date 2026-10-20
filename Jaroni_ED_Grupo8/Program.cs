@@ -10,10 +10,8 @@ namespace Jaroni_ED_Grupo8
         // Método principal donde comienza la ejecución
         static void Main()
         {
-            // Inicializa la configuración de Windows Forms
             ApplicationConfiguration.Initialize();
 
-            // Abre el formulario del historial de acciones
             Application.Run(new JaroniApp.FormHistorial());
         }
     }
