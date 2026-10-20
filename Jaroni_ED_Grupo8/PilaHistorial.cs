@@ -1,134 +1,73 @@
-﻿
+using JaroniApp;
+
 namespace Jaroni_ED_Grupo8
 {
-    // Clase que representa un nodo de la pila
-    public class NodoAccion
+    // Un nodo guarda una venta y el enlace al registro que quedó debajo.
+    public sealed class NodoPilaVenta
     {
-        // Guarda la información de una acción
-        public Accion Dato { get; set; }
+        public VentaHistorialDemo Dato { get; }
+        public NodoPilaVenta? Siguiente { get; set; }
 
-        // Guarda la referencia al siguiente nodo
-        public NodoAccion? Siguiente { get; set; }
-
-        // Constructor que recibe una acción
-        public NodoAccion(Accion accion)
+        public NodoPilaVenta(VentaHistorialDemo dato)
         {
-            Dato = accion;
-            Siguiente = null;
+            Dato = dato;
         }
     }
 
-    // Clase que administra el historial de acciones mediante una pila
-    public class PilaHistorial
+    public sealed class PilaHistorial
     {
-        // Guarda el nodo que se encuentra en la cima de la pila
-        private NodoAccion? cima;
-
-        // Guarda la cantidad de acciones registradas
+        // El tope es el último registro agregado. LIFO: último en entrar, primero en salir.
+        private NodoPilaVenta? tope;
         private int cantidad;
 
-        // Devuelve la cantidad de acciones almacenadas
-        public int Cantidad => cantidad;
+        public bool EstaVacia => tope is null;
+        public int Longitud => cantidad;
 
-        // Verifica si la pila está vacía
-        public bool EstaVacia => cima == null;
-
-        // Constructor que inicializa la pila vacía
-        public PilaHistorial()
+        public void Push(VentaHistorialDemo venta)
         {
-            cima = null;
-            cantidad = 0;
-        }
-
-        // PUSH: Agrega una nueva acción a la pila
-        public void Push(Accion accion)
-        {
-            // Creamos un nuevo nodo con la acción
-            NodoAccion nuevo = new NodoAccion(accion);
-
-            // Conectamos el nuevo nodo con la cima anterior
-            nuevo.Siguiente = cima;
-
-            // El nuevo nodo pasa a ser la cima
-            cima = nuevo;
-
-            // Aumentamos la cantidad de acciones
+            // Primero enlazamos el nuevo nodo al antiguo tope; luego pasa a ser la cima.
+            var nuevo = new NodoPilaVenta(venta);
+            nuevo.Siguiente = tope;
+            tope = nuevo;
             cantidad++;
         }
 
-        // Registra una acción indicando el módulo y la descripción
-        public void Registrar(string modulo, string descripcion)
+        public VentaHistorialDemo Pop()
         {
-            // Crea una acción y la agregamos a la pila
-            Push(new Accion(modulo, descripcion));
-        }
+            if (tope is null)
+                throw new InvalidOperationException("La pila está vacía.");
 
-        // PEEK: Consulta la última acción sin eliminarla
-        public Accion Peek()
-        {
-            // Verifica si la pila está vacía
-            if (cima == null)
-            {
-                throw new InvalidOperationException("El historial está vacío.");
-            }
-
-            // devuelve la acción que está en la cima
-            return cima.Dato;
-        }
-
-        // POP: Retira la última acción registrada
-        public Accion Pop()
-        {
-            // Verifica si la pila está vacía
-            if (cima == null)
-            {
-                throw new InvalidOperationException("El historial está vacío.");
-            }
-
-            // Guarda la acción que vamos a retirar
-            Accion accion = cima.Dato;
-
-            // El siguiente nodo pasa a ser la nueva cima
-            cima = cima.Siguiente;
-
-            // Disminuye la cantidad de acciones
+            // El segundo nodo pasa a ser el nuevo tope; no se elimina ningún intermedio.
+            var retirada = tope.Dato;
+            tope = tope.Siguiente;
             cantidad--;
-
-            // Devuelve la acción retirada
-            return accion;
+            return retirada;
         }
 
-        // Obtiene todas las acciones desde la más reciente
-        public List<Accion> ObtenerTodas()
+        public VentaHistorialDemo Top()
         {
-            // Crea una lista para guardar las acciones
-            List<Accion> acciones = new List<Accion>();
+            if (tope is null)
+                throw new InvalidOperationException("La pila está vacía.");
 
-            // Comienza el recorrido desde la cima
-            NodoAccion? actual = cima;
+            // Consultar no cambia enlaces ni contador.
+            return tope.Dato;
+        }
 
-            // Recorre los nodos hasta llegar al final
-            while (actual != null)
+        public void Clear()
+        {
+            tope = null;
+            cantidad = 0;
+        }
+
+        public void Recorrer(Action<VentaHistorialDemo> visitar)
+        {
+            // La pila se recorre del tope a la base siguiendo Siguiente, sin desapilar.
+            var actual = tope;
+            while (actual is not null)
             {
-                // Agrega la acción a la lista
-                acciones.Add(actual.Dato);
-
-                // Avanza al siguiente nodo
+                visitar(actual.Dato);
                 actual = actual.Siguiente;
             }
-
-            // Devuelve todas las acciones encontradas
-            return acciones;
-        }
-
-        // Elimina todas las acciones del historial
-        public void Limpiar()
-        {
-            // Deja la pila sin nodos
-            cima = null;
-
-            // Reinicia la cantidad de acciones
-            cantidad = 0;
         }
     }
 }

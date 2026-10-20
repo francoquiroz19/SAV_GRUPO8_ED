@@ -1,220 +1,193 @@
-﻿
+using System.Drawing;
+using System.Globalization;
+using System.Windows.Forms;
+using JaroniApp;
+
 namespace Jaroni_ED_Grupo8
-{ 
-    // Formulario que permite registrar y consultar el historial de acciones
+{
     public class FormHistorial : Form
     {
-        // Pila donde se almacenan las acciones registradas
-        private readonly PilaHistorial historial;
+        private const int RegistrosIniciales = 10;
+        private readonly PilaHistorial historial = new();
+        private static readonly CultureInfo CulturaSoles = CultureInfo.GetCultureInfo("es-PE");
 
-        // Controles que utilizaremos en el formulario
-        private readonly Label lblModulo = new Label();
-        private readonly ComboBox cmbModulo = new ComboBox();
-        private readonly Label lblDescripcion = new Label();
-        private readonly TextBox txtDescripcion = new TextBox();
+        private readonly DataGridView tabla = new();
+        private readonly Button btnVerUltima = new();
+        private readonly Button btnRetirarUltima = new();
+        private readonly Button btnVerPendientes = new();
+        private readonly Button btnReiniciar = new();
+        private readonly Label lblUltima = new();
+        private readonly Label lblCantidad = new();
+        private readonly Label lblRevisadas = new();
+        private readonly Label lblEstado = new();
 
-        // Botones para realizar las operaciones de la pila
-        private readonly Button btnRegistrar = new Button();
-        private readonly Button btnVerUltima = new Button();
-        private readonly Button btnRetirarUltima = new Button();
-        private readonly Button btnLimpiar = new Button();
-
-        // Controles para mostrar las acciones registradas
-        private readonly Label lblUltimaAccion = new Label();
-        private readonly ListBox lstHistorial = new ListBox();
-        private readonly Label lblCantidad = new Label();
-
-        // Constructor que crea el formulario con una pila nueva
-        public FormHistorial() : this(new PilaHistorial())
+        public FormHistorial()
         {
-        }
+            Text = "Historial de ventas";
+            Size = new Size(780, 570);
+            MinimumSize = new Size(780, 570);
+            StartPosition = FormStartPosition.CenterParent;
 
-        // Constructor que recibe la pila que vamos a utilizar
-        public FormHistorial(PilaHistorial historial)
-        {
-            this.historial = historial;
-
-            // Configuramos el título, tamaño y posición del formulario
-            Text = "Historial de acciones";
-            Size = new Size(640, 520);
-            StartPosition = FormStartPosition.CenterScreen;
-
-            // Organiza los controles y muestra el historial
             InicializarControles();
-            RefrescarHistorial();
+            CargarVentasIniciales();
+            ActualizarPresentacion();
         }
 
-        // Método que configura los controles del formulario
+        private static string Soles(decimal importe) => "S/ " + importe.ToString("N2", CulturaSoles);
+
         private void InicializarControles()
         {
-            // Configura la etiqueta del módulo
-            lblModulo.Text = "Módulo:";
-            lblModulo.Location = new Point(20, 24);
-            lblModulo.Size = new Size(60, 23);
+            Controls.Add(new Label
+            {
+                Text = "HISTORIAL DE VENTAS",
+                Font = new Font(Font, FontStyle.Bold),
+                Location = new Point(20, 16),
+                Size = new Size(300, 26)
+            });
+            Controls.Add(new Label
+            {
+                Text = "Revisión de ventas recientes — Pila LIFO",
+                Location = new Point(20, 47),
+                Size = new Size(420, 22)
+            });
 
-            // Configura la lista de módulos disponibles
-            cmbModulo.Location = new Point(90, 20);
-            cmbModulo.Size = new Size(180, 23);
-            cmbModulo.DropDownStyle = ComboBoxStyle.DropDownList;
-            cmbModulo.Items.AddRange(new object[] { "Productos", "Pedidos", "Clientes", "Proveedores", "Historial", "Ventas" });
-            cmbModulo.SelectedIndex = 0;
+            tabla.Location = new Point(20, 82);
+            tabla.Size = new Size(724, 295);
+            tabla.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tabla.ReadOnly = true;
+            tabla.AllowUserToAddRows = false;
+            tabla.AllowUserToDeleteRows = false;
+            tabla.AllowUserToResizeRows = false;
+            tabla.MultiSelect = false;
+            tabla.SelectionMode = DataGridViewSelectionMode.FullRowSelect;
+            tabla.RowHeadersVisible = false;
+            tabla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Código", FillWeight = 12F });
+            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Fecha y hora", FillWeight = 23F });
+            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Producto", FillWeight = 25F });
+            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Cantidad", FillWeight = 12F });
+            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Precio unitario", FillWeight = 15F });
+            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Total", FillWeight = 13F });
+            Controls.Add(tabla);
 
-            // Configura la etiqueta de descripción
-            lblDescripcion.Text = "Descripción:";
-            lblDescripcion.Location = new Point(20, 58);
-            lblDescripcion.Size = new Size(70, 23);
+            ConfigurarBoton(btnVerUltima, "Consultar última venta", 20, 170, BtnVerUltima_Click);
+            ConfigurarBoton(btnRetirarUltima, "Marcar última como revisada", 200, 210, BtnRetirarUltima_Click);
+            ConfigurarBoton(btnVerPendientes, "Ver ventas pendientes", 420, 160, BtnVerPendientes_Click);
+            ConfigurarBoton(btnReiniciar, "Reiniciar revisión", 590, 155, BtnReiniciar_Click);
 
-            // Configura el cuadro donde se escribe la acción
-            txtDescripcion.Location = new Point(90, 54);
-            txtDescripcion.Size = new Size(510, 23);
-            txtDescripcion.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            lblUltima.Location = new Point(20, 439);
+            lblUltima.Size = new Size(220, 23);
+            lblUltima.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            Controls.Add(lblUltima);
 
-            // Botón para registrar una nueva acción (Push)
-            btnRegistrar.Text = "Registrar acción";
-            btnRegistrar.Location = new Point(20, 94);
-            btnRegistrar.Size = new Size(130, 30);
-            btnRegistrar.Click += BtnRegistrar_Click;
-
-            // Botón para consultar la última acción (Peek)
-            btnVerUltima.Text = "Ver última";
-            btnVerUltima.Location = new Point(160, 94);
-            btnVerUltima.Size = new Size(110, 30);
-            btnVerUltima.Click += BtnVerUltima_Click;
-
-            // Botón para retirar la última acción (Pop)
-            btnRetirarUltima.Text = "Retirar última";
-            btnRetirarUltima.Location = new Point(280, 94);
-            btnRetirarUltima.Size = new Size(120, 30);
-            btnRetirarUltima.Click += BtnRetirarUltima_Click;
-
-            // Botón para eliminar todas las acciones
-            btnLimpiar.Text = "Limpiar historial";
-            btnLimpiar.Location = new Point(410, 94);
-            btnLimpiar.Size = new Size(130, 30);
-            btnLimpiar.Click += BtnLimpiar_Click;
-
-            // Muestra la última acción registrada
-            lblUltimaAccion.Location = new Point(20, 140);
-            lblUltimaAccion.Size = new Size(580, 25);
-            lblUltimaAccion.Font = new Font("Segoe UI", 10, FontStyle.Bold);
-            lblUltimaAccion.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-
-            // Lista donde se mostrarán todas las acciones
-            lstHistorial.Location = new Point(20, 175);
-            lstHistorial.Size = new Size(580, 260);
-            lstHistorial.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-
-            // Muestra la cantidad de acciones
-            lblCantidad.Location = new Point(20, 445);
-            lblCantidad.Size = new Size(250, 23);
+            lblCantidad.Location = new Point(250, 439);
+            lblCantidad.Size = new Size(240, 23);
             lblCantidad.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-
-            // Agrega todos los controles al formulario
-            Controls.Add(lblModulo);
-            Controls.Add(cmbModulo);
-            Controls.Add(lblDescripcion);
-            Controls.Add(txtDescripcion);
-            Controls.Add(btnRegistrar);
-            Controls.Add(btnVerUltima);
-            Controls.Add(btnRetirarUltima);
-            Controls.Add(btnLimpiar);
-            Controls.Add(lblUltimaAccion);
-            Controls.Add(lstHistorial);
             Controls.Add(lblCantidad);
+
+            lblRevisadas.Location = new Point(500, 439);
+            lblRevisadas.Size = new Size(245, 23);
+            lblRevisadas.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            Controls.Add(lblRevisadas);
+
+            lblEstado.Location = new Point(20, 472);
+            lblEstado.Size = new Size(720, 23);
+            lblEstado.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            Controls.Add(lblEstado);
         }
 
-        // Actualiza la lista de acciones que se muestra en pantalla
-        private void RefrescarHistorial()
+        private void ConfigurarBoton(Button boton, string texto, int x, int ancho, EventHandler accion)
         {
-            // Limpia la lista para evitar datos repetidos
-            lstHistorial.Items.Clear();
-
-            // Recorre las acciones desde la más reciente
-            foreach (Accion accion in historial.ObtenerTodas())
-            {
-                lstHistorial.Items.Add(accion);
-            }
-
-            // Muestra la cantidad de acciones registradas
-            lblCantidad.Text = $"Total de acciones: {historial.Cantidad}";
-
-            // Verifica si existen acciones en la pila
-            if (historial.EstaVacia)
-            {
-                lblUltimaAccion.Text = "Última acción: (ninguna)";
-            }
-            else
-            {
-                // Muestra la última acción sin retirarla
-                lblUltimaAccion.Text = $"Última acción: {historial.Peek()}";
-            }
+            boton.Text = texto;
+            boton.Location = new Point(x, 394);
+            boton.Size = new Size(ancho, 30);
+            boton.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            boton.Click += accion;
+            Controls.Add(boton);
         }
 
-        // Evento del botón Registrar acción
-        private void BtnRegistrar_Click(object? sender, EventArgs e)
+        private void CargarVentasIniciales()
         {
-            // Obtenemos el texto ingresado
-            string descripcion = txtDescripcion.Text.Trim();
-
-            // Verifica que la descripción no esté vacía
-            if (string.IsNullOrEmpty(descripcion))
-            {
-                MessageBox.Show("Ingrese la descripción de la acción.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return;
-            }
-
-            // Registramos la acción en el módulo seleccionado
-            historial.Registrar(cmbModulo.Text, descripcion);
-
-            // Limpia el cuadro de texto
-            txtDescripcion.Clear();
-
-            // Actualiza el historial mostrado
-            RefrescarHistorial();
+            // Diez Push en orden cronológico: V010 termina en el tope de la pila.
+            // Las fechas son fijas; actualizar la tabla no cambia los registros.
+            historial.Push(new VentaHistorialDemo("V001", new DateTime(2026, 9, 1, 9, 0, 0), "Mouse óptico", 1, 35.90m));
+            historial.Push(new VentaHistorialDemo("V002", new DateTime(2026, 9, 2, 9, 0, 0), "Teclado", 2, 60.00m));
+            historial.Push(new VentaHistorialDemo("V003", new DateTime(2026, 9, 3, 9, 0, 0), "Tinta para impresora", 1, 45.00m));
+            historial.Push(new VentaHistorialDemo("V004", new DateTime(2026, 9, 4, 9, 0, 0), "Papel bond A4", 3, 25.00m));
+            historial.Push(new VentaHistorialDemo("V005", new DateTime(2026, 9, 5, 9, 0, 0), "Memoria USB", 2, 30.00m));
+            historial.Push(new VentaHistorialDemo("V006", new DateTime(2026, 9, 6, 9, 0, 0), "Cuaderno A4", 4, 10.00m));
+            historial.Push(new VentaHistorialDemo("V007", new DateTime(2026, 9, 7, 9, 0, 0), "Lapicero azul", 5, 2.50m));
+            historial.Push(new VentaHistorialDemo("V008", new DateTime(2026, 9, 8, 9, 0, 0), "Cable HDMI", 1, 28.00m));
+            historial.Push(new VentaHistorialDemo("V009", new DateTime(2026, 9, 9, 9, 0, 0), "Cartucho de tinta", 2, 75.00m));
+            historial.Push(new VentaHistorialDemo("V010", new DateTime(2026, 9, 10, 9, 0, 0), "Audífonos", 1, 85.00m));
         }
 
-        // Evento del botón Ver última acción
+        private void ActualizarPresentacion()
+        {
+            tabla.Rows.Clear();
+            // La grilla se reconstruye recorriendo los nodos desde el tope hacia la base.
+            historial.Recorrer(venta => tabla.Rows.Add(venta.Codigo,
+                venta.FechaHora.ToString("dd/MM/yyyy HH:mm:ss"), venta.Producto,
+                venta.Cantidad, Soles(venta.PrecioUnitario), Soles(venta.Total)));
+
+            lblUltima.Text = historial.EstaVacia
+                ? "Última venta pendiente: Ninguna"
+                : "Última venta pendiente: " + historial.Top().Codigo;
+            lblCantidad.Text = "Ventas pendientes de revisión: " + historial.Longitud;
+            lblRevisadas.Text = "Ventas revisadas en esta sesión: " + (RegistrosIniciales - historial.Longitud);
+            tabla.ClearSelection();
+        }
+
         private void BtnVerUltima_Click(object? sender, EventArgs e)
         {
-            // Verifica si la pila está vacía
             if (historial.EstaVacia)
             {
-                MessageBox.Show("El historial está vacío.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(this, "No hay ventas pendientes de revisión.",
+                    "Consultar última venta", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            // Consulta la última acción sin eliminarla
-            MessageBox.Show(historial.Peek().ToString(), "Última acción", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Top solo consulta: la venta continúa en la cima y Longitud no cambia.
+            var ultima = historial.Top();
+            MessageBox.Show(this,
+                $"Código: {ultima.Codigo}\nProducto: {ultima.Producto}\nCantidad: {ultima.Cantidad}\nTotal: {Soles(ultima.Total)}",
+                "Última venta pendiente", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
-        // Evento del botón Retirar última acción
         private void BtnRetirarUltima_Click(object? sender, EventArgs e)
         {
-            // Verifica si existen acciones para retirar
             if (historial.EstaVacia)
             {
-                MessageBox.Show("No hay acciones para retirar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                lblEstado.Text = "No hay ventas pendientes para marcar como revisadas.";
                 return;
             }
 
-            // Retira la última acción de la pila
-            Accion retirada = historial.Pop();
-
-            // Actualiza el historial
-            RefrescarHistorial();
-
-            // Muestra la acción que fue retirada
-            MessageBox.Show(retirada.ToString(), "Acción retirada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            // Pop solo retira el tope de esta pila temporal; no anula una venta real ni toca Inventario.
+            var retirada = historial.Pop();
+            ActualizarPresentacion();
+            lblEstado.Text = $"Venta {retirada.Codigo} revisada y retirada de pendientes.";
         }
 
-        // Evento del botón Limpiar historial
-        private void BtnLimpiar_Click(object? sender, EventArgs e)
+        private void BtnVerPendientes_Click(object? sender, EventArgs e)
         {
-            // Elimina todas las acciones de la pila
-            historial.Limpiar();
+            // Recorrer lee cada nodo desde el tope sin modificar la pila.
+            ActualizarPresentacion();
+            lblEstado.Text = historial.EstaVacia
+                ? "No hay ventas pendientes de revisión."
+                : $"Se muestran {historial.Longitud} ventas pendientes, de la más reciente a la más antigua.";
+        }
 
-            // Actualiza la información del formulario
-            RefrescarHistorial();
+        private void BtnReiniciar_Click(object? sender, EventArgs e)
+        {
+            if (MessageBox.Show(this, "¿Reiniciar la revisión de las 10 ventas de ejemplo?",
+                    "Confirmar reinicio", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            // Clear evita duplicados; los diez registros vuelven a entrar mediante Push.
+            historial.Clear();
+            CargarVentasIniciales();
+            ActualizarPresentacion();
+            lblEstado.Text = "Revisión reiniciada: las 10 ventas vuelven a estar pendientes.";
         }
     }
 }
