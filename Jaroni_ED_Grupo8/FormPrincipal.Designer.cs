@@ -1,4 +1,4 @@
-﻿namespace Jaroni_ED_Grupo8
+﻿namespace JaroniApp
 {
     partial class FormPrincipal
     {

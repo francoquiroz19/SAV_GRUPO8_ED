@@ -1,14 +1,9 @@
 namespace JaroniApp;
-using System.Globalization;
 using Jaroni_ED_Grupo8;
 
 
-public partial class FormHistorial
+public partial class FormVentas
 {
-    private readonly VentasListaCircular<VentasDetalle> detalleVenta = new();
-    private VentasNodo<VentasDetalle>? articuloActual;
-    private static readonly CultureInfo CulturaSoles = CultureInfo.GetCultureInfo("es-PE");
-
     private readonly Panel panelVentas = new();
     private readonly ComboBox cboProducto = new();
     private readonly TextBox txtPrecio = new();
@@ -24,13 +19,9 @@ public partial class FormHistorial
 
     private void InicializarSeccionVentas()
     {
-        MinimumSize = new Size(640, 520);
-        cmbModulo.Items.Add("Ventas");
-
-        panelVentas.Location = new Point(20, 54);
+        panelVentas.Location = new Point(20, 20);
         panelVentas.Size = new Size(580, 350);
         panelVentas.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        panelVentas.Visible = false;
         Controls.Add(panelVentas);
 
         panelVentas.Controls.Add(new Label
@@ -118,25 +109,6 @@ public partial class FormHistorial
         ConectarEventosVentas();
         CargarProductosDemo();
         ActualizarPresentacionVenta();
-        cmbModulo.SelectedIndexChanged += (_, _) => CambiarSeccion();
-    }
-
-    private void CambiarSeccion()
-    {
-        var mostrarVentas = cmbModulo.SelectedItem?.ToString() == "Ventas";
-        // El selector permanece disponible; los controles ocultos tampoco reciben teclado.
-        foreach (var control in new Control[]
-        {
-            lblDescripcion, txtDescripcion, btnRegistrar, btnVerUltima,
-            btnRetirarUltima, btnLimpiar, lblUltimaAccion, lstHistorial, lblCantidad
-        })
-        {
-            control.Visible = !mostrarVentas;
-            control.Enabled = !mostrarVentas;
-        }
-
-        panelVentas.Visible = mostrarVentas;
-        if (mostrarVentas) panelVentas.BringToFront();
     }
 
     private void CargarProductosDemo()

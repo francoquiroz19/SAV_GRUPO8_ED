@@ -4,11 +4,11 @@ using Jaroni_ED_Grupo8;
 
 namespace JaroniApp;
 
-public partial class FormHistorial
+public partial class FormVentas
 {
     private void ConectarEventosVentas()
     {
-        // Los eventos de Ventas se conectan una vez en el FormHistorial existente.
+        // Los eventos de Ventas se conectan una vez en su propio formulario.
         cboProducto.SelectedIndexChanged += (_, _) => ActualizarPrecioVenta();
         btnAgregarVenta.Click += Agregar_Click;
         btnQuitarVenta.Click += Quitar_Click;
@@ -102,7 +102,7 @@ public partial class FormHistorial
 
     private void LimpiarVenta_Click(object? sender, EventArgs e)
     {
-        // Limpiar descarta solo el detalle circular; el historial y catálogo permanecen.
+        // Limpiar descarta solo el detalle circular; el catálogo demo permanece.
         detalleVenta.Vaciar();
         articuloActual = null;
         nudCantidad.Value = 1;

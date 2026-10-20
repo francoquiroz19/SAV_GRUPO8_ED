@@ -7,27 +7,29 @@ using System.Windows.Forms;
 
 namespace JaroniApp
 {
-    public class FormPrincipal : Form
+    public partial class FormPrincipal : Form
     {
         public FormPrincipal()
         {
-            Text = "Sistema de Gestión";
+            InitializeComponent();
+            Text = "Sistema de GestiÃ³n";
             Size = new Size(600, 400);
             StartPosition = FormStartPosition.CenterScreen;
 
             var titulo = new Label
             {
-                Text = "SISTEMA DE GESTIÓN",
+                Text = "SISTEMA DE GESTIÃ“N",
                 Font = new Font("Segoe UI", 18, FontStyle.Bold),
                 AutoSize = true,
                 Location = new Point(155, 35)
             };
             Controls.Add(titulo);
 
-            AgregarBoton("Productos", 100, 110, AbrirProductos);
-            AgregarBoton("Pedidos", 320, 110, AbrirPedidos);
-            AgregarBoton("Ventas", 100, 200, AbrirVentas);
-            AgregarBoton("Historial", 320, 200, AbrirHistorial);
+            AgregarBoton("Productos", 100, 105, AbrirProductos);
+            AgregarBoton("Pedidos", 320, 105, AbrirPedidos);
+            AgregarBoton("Ventas", 100, 175, AbrirVentas);
+            AgregarBoton("Clientes", 320, 175, AbrirClientes);
+            AgregarBoton("Historial", 210, 245, AbrirHistorial);
         }
 
         private void AgregarBoton(string texto, int x, int y, EventHandler accion)
@@ -56,7 +58,12 @@ namespace JaroniApp
 
         private void AbrirVentas(object? sender, EventArgs e)
         {
-            new FormHistorial().ShowDialog();
+            new FormVentas().ShowDialog(this);
+        }
+
+        private void AbrirClientes(object? sender, EventArgs e)
+        {
+            new FormClientes().ShowDialog(this);
         }
 
         private void AbrirHistorial(object? sender, EventArgs e)
