@@ -39,7 +39,7 @@
             count = 0;
         }
 
-        // ---------- MÉTODOS PRINCIPALES ----------
+        // MÉTODOS PRINCIPALES
 
         // Verifica si ya existe un cliente con el código indicado
         public bool ExisteCodigo(int codigo)

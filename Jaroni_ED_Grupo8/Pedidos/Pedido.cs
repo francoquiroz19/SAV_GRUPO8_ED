@@ -3,7 +3,7 @@ using System;
 
 namespace Jaroni_ED_Grupo8
 {
-    // CONTIENE LOS DATOS DE UN PEDIDO
+    // Contiene los datos básicos y el estado de un pedido.
     public class Pedido
     {
         public int Codigo { get; set; }
@@ -12,7 +12,7 @@ namespace Jaroni_ED_Grupo8
         public DateTime Fecha { get; set; }
         public string Estado { get; set; }
 
-        // INICIALIZA LOS DATOS DEL PEDIDO
+        // Inicializa el pedido con sus datos de registro.
         public Pedido(int codigo, string cliente, string productos, DateTime fecha)
         {
             Codigo = codigo;
@@ -20,7 +20,6 @@ namespace Jaroni_ED_Grupo8
             Productos = productos;
             Fecha = fecha;
 
-            // TODO PEDIDO NUEVO INICIA COMO PENDIENTE
             Estado = "Pendiente";
         }
     }

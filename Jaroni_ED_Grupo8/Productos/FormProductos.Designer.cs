@@ -168,7 +168,7 @@ namespace Jaroni_ED_Grupo8
             this.btnBuscar.Name = "btnBuscar";
             this.btnBuscar.Size = new System.Drawing.Size(120, 30);
             this.btnBuscar.TabIndex = 13;
-            this.btnBuscar.Text = "Buscar por Cód.";
+            this.btnBuscar.Text = "Buscar por código";
             this.btnBuscar.UseVisualStyleBackColor = true;
             this.btnBuscar.Click += new System.EventHandler(this.btnBuscar_Click);
             // 
@@ -198,7 +198,7 @@ namespace Jaroni_ED_Grupo8
             this.btnEntrada.Name = "btnEntrada";
             this.btnEntrada.Size = new System.Drawing.Size(120, 30);
             this.btnEntrada.TabIndex = 16;
-            this.btnEntrada.Text = "+ Entrada Stock";
+            this.btnEntrada.Text = "Registrar entrada";
             this.btnEntrada.UseVisualStyleBackColor = true;
             this.btnEntrada.Click += new System.EventHandler(this.btnEntrada_Click);
             // 
@@ -208,7 +208,7 @@ namespace Jaroni_ED_Grupo8
             this.btnSalida.Name = "btnSalida";
             this.btnSalida.Size = new System.Drawing.Size(120, 30);
             this.btnSalida.TabIndex = 17;
-            this.btnSalida.Text = "- Salida Stock";
+            this.btnSalida.Text = "Registrar salida";
             this.btnSalida.UseVisualStyleBackColor = true;
             this.btnSalida.Click += new System.EventHandler(this.btnSalida_Click);
             // 
@@ -218,7 +218,7 @@ namespace Jaroni_ED_Grupo8
             this.btnBajoStock.Name = "btnBajoStock";
             this.btnBajoStock.Size = new System.Drawing.Size(120, 30);
             this.btnBajoStock.TabIndex = 18;
-            this.btnBajoStock.Text = "Ver Bajo Stock";
+            this.btnBajoStock.Text = "Ver bajo stock";
             this.btnBajoStock.UseVisualStyleBackColor = true;
             this.btnBajoStock.Click += new System.EventHandler(this.btnBajoStock_Click);
             // 
@@ -228,7 +228,7 @@ namespace Jaroni_ED_Grupo8
             this.btnMostrarTodos.Name = "btnMostrarTodos";
             this.btnMostrarTodos.Size = new System.Drawing.Size(120, 30);
             this.btnMostrarTodos.TabIndex = 19;
-            this.btnMostrarTodos.Text = "Mostrar Todos";
+            this.btnMostrarTodos.Text = "Mostrar todos";
             this.btnMostrarTodos.UseVisualStyleBackColor = true;
             this.btnMostrarTodos.Click += new System.EventHandler(this.btnMostrarTodos_Click);
             // 
@@ -270,7 +270,7 @@ namespace Jaroni_ED_Grupo8
             this.Controls.Add(this.txtCodigo);
             this.Controls.Add(this.lblCodigo);
             this.Name = "FormProductos";
-            this.Text = "JARONI - Gestión de Inventario";
+            this.Text = "JARONI | Productos";
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventario)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

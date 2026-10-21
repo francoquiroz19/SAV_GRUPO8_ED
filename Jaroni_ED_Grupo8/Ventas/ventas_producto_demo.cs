@@ -1,5 +1,6 @@
 namespace Jaroni_ED_Grupo8;
 
+// Producto de ejemplo disponible solo para el catálogo en memoria de Ventas.
 public sealed class VentasProductoDemo
 {
     public string Codigo { get; }
