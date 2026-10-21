@@ -9,14 +9,25 @@ public sealed class VentasDetalle
     public decimal PrecioUnitario { get; }
     public decimal Subtotal => Cantidad * PrecioUnitario;
 
-    public VentasDetalle(VentasProductoDemo producto, int cantidad)
+    public VentasDetalle(Producto producto, int cantidad)
+        : this(producto.Codigo, producto.Nombre, cantidad, producto.Precio)
     {
-        Codigo = producto.Codigo;
-        Nombre = producto.Nombre;
-        PrecioUnitario = producto.PrecioUnitario;
+    }
+
+    // Conserva código, nombre y precio aunque el inventario cambie después.
+    public VentasDetalle(string codigo, string nombre, int cantidad, decimal precioUnitario)
+    {
+        Codigo = codigo;
+        Nombre = nombre;
         Cantidad = cantidad;
+        PrecioUnitario = precioUnitario;
     }
 
     // Suma unidades del mismo producto; el subtotal se recalcula con la cantidad.
-    public void Acumular(int cantidad) => Cantidad = checked(Cantidad + cantidad);
+    public void Acumular(int cantidad)
+    {
+        if (cantidad <= 0 || Cantidad > int.MaxValue - cantidad)
+            throw new OverflowException("La cantidad del artículo es inválida.");
+        Cantidad += cantidad;
+    }
 }

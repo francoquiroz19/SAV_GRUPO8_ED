@@ -6,8 +6,8 @@
     {
         // LISTA Y VARIABLES DE ESTADO
 
-        // Lista donde se almacenan los clientes
-        private readonly ListaClientes lista = new ListaClientes();
+        // Lista compartida: los clientes no se pierden al cerrar esta ventana.
+        private readonly ListaClientes lista;
 
         // CONTROLES DEL FORMULARIO
         private readonly Label lblCodigo = new Label();
@@ -34,16 +34,16 @@
         private readonly Label lblInfo = new Label();
 
         // Constructor del formulario
-        public FormClientes()
+        public FormClientes(EstadoAplicacion estado)
         {
+            lista = estado.ClientesRegistrados;
             // Configuramos el título, tamaño y posición del formulario
-            Text = "JARONI | Clientes";
+            Text = "JARONI - PANEL DE CLIENTES";
             Size = new Size(640, 560);
             StartPosition = FormStartPosition.CenterScreen;
 
-            // Crea los controles y carga clientes de ejemplo
+            // Crea los controles y muestra únicamente clientes registrados en esta sesión.
             InicializarControles();
-            CargarDatosEjemplo();
             RefrescarLista();
         }
 
@@ -168,14 +168,6 @@
         }
 
         // MÉTODOS AUXILIARES
-
-        // Agrega algunos clientes de ejemplo al iniciar
-        private void CargarDatosEjemplo()
-        {
-            lista.Agregar(new Cliente(1, "Ana Pérez", "45871236", "987654321", "ana@correo.com", "Av. Lima 123"));
-            lista.Agregar(new Cliente(2, "Distribuidora Sol SAC", "20456789123", "014567890", "ventas@sol.com", "Jr. Cusco 456"));
-            lista.Agregar(new Cliente(3, "Luis Gómez", "70123456", "955123456", "luis@correo.com", "Calle Los Pinos 789"));
-        }
 
         // Actualiza el ListBox con todos los clientes y el total
         private void RefrescarLista()

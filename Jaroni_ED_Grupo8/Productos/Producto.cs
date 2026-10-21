@@ -21,5 +21,7 @@ namespace Jaroni_ED_Grupo8
             Precio = precio;
             Ubicacion = ubicacion;
         }
+
+        public override string ToString() => $"{Codigo} — {Nombre}";
     }
 }

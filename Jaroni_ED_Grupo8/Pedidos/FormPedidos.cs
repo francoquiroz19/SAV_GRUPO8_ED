@@ -2,19 +2,24 @@
 using System;
 using System.Drawing;
 using System.Windows.Forms;
+using Jaroni_ED_Grupo8;
 
 namespace JaroniApp
 {
     // Recibe pedidos desde el formulario y presenta sus datos en la tabla.
     public partial class FormPedidos : Form
     {
+        private readonly EstadoAplicacion estado;
+        private readonly ListaPedidos pedidos;
         private readonly DataGridView tabla = new DataGridView();
         private readonly TextBox txtCliente = new TextBox();
         private readonly TextBox txtProducto = new TextBox();
         private readonly NumericUpDown numCantidad = new NumericUpDown();
 
-        public FormPedidos()
+        public FormPedidos(EstadoAplicacion estado)
         {
+            this.estado = estado;
+            pedidos = estado.PedidosRegistrados;
             Text = "JARONI | Pedidos";
             Size = new Size(750, 500);
             StartPosition = FormStartPosition.CenterScreen;
@@ -63,6 +68,20 @@ namespace JaroniApp
             tabla.Columns.Add("Cantidad", "Cantidad");
 
             Controls.Add(tabla);
+            ActualizarTabla();
+        }
+
+        // Reconstruye las filas a partir de los nodos de la lista doble.
+        private void ActualizarTabla()
+        {
+            tabla.Rows.Clear();
+            NodoPedido? nodoActual = pedidos.ObtenerCabeza();
+            while (nodoActual is not null)
+            {
+                Pedido pedido = nodoActual.Dato;
+                tabla.Rows.Add(pedido.Cliente, pedido.Productos, pedido.Cantidad);
+                nodoActual = nodoActual.Siguiente;
+            }
         }
 
         // Prepara una etiqueta de entrada con la misma presentación del formulario.
@@ -76,7 +95,7 @@ namespace JaroniApp
             };
         }
 
-        // Valida los campos y agrega el pedido visible a la tabla.
+        // Valida los campos y guarda el pedido en la lista doble compartida.
         private void AgregarPedido(object? sender, EventArgs e)
         {
             string cliente = txtCliente.Text.Trim();
@@ -92,10 +111,10 @@ namespace JaroniApp
                 return;
             }
 
-            tabla.Rows.Add(
-                cliente,
-                producto,
-                numCantidad.Value);
+            var pedidoRegistrado = new Pedido(estado.TomarCodigoPedido(),
+                cliente, producto, DateTime.Now, (int)numCantidad.Value);
+            pedidos.Agregar(pedidoRegistrado);
+            ActualizarTabla();
 
             txtCliente.Clear();
             txtProducto.Clear();

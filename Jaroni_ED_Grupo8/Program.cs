@@ -8,7 +8,9 @@ namespace Jaroni_ED_Grupo8
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new JaroniApp.FormPrincipal());
+            // Una sola instancia conserva los datos mientras la aplicación está abierta.
+            var estado = new EstadoAplicacion();
+            Application.Run(new JaroniApp.FormPrincipal(estado));
         }
     }
 }

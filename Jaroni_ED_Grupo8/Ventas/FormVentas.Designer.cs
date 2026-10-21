@@ -25,7 +25,7 @@ namespace JaroniApp
         private Label lblTotalValor = null!;
         private Button btnQuitarVenta = null!;
         private Button btnSiguienteVenta = null!;
-        private Button btnSimularVenta = null!;
+        private Button btnConfirmarVenta = null!;
         private Button btnLimpiarVenta = null!;
 
         protected override void Dispose(bool disposing)
@@ -57,7 +57,7 @@ namespace JaroniApp
             lblTotalValor = new Label();
             btnQuitarVenta = new Button();
             btnSiguienteVenta = new Button();
-            btnSimularVenta = new Button();
+            btnConfirmarVenta = new Button();
             btnLimpiarVenta = new Button();
             panelVentas.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)nudCantidad).BeginInit();
@@ -79,7 +79,7 @@ namespace JaroniApp
             panelVentas.Controls.Add(lblTotalValor);
             panelVentas.Controls.Add(btnQuitarVenta);
             panelVentas.Controls.Add(btnSiguienteVenta);
-            panelVentas.Controls.Add(btnSimularVenta);
+            panelVentas.Controls.Add(btnConfirmarVenta);
             panelVentas.Controls.Add(btnLimpiarVenta);
             panelVentas.Location = new Point(20, 20);
             panelVentas.Name = "panelVentas";
@@ -181,12 +181,12 @@ namespace JaroniApp
             btnSiguienteVenta.Text = "Siguiente";
             btnSiguienteVenta.UseVisualStyleBackColor = true;
             btnSiguienteVenta.Click += Siguiente_Click;
-            btnSimularVenta.Location = new Point(230, 311);
-            btnSimularVenta.Name = "btnSimularVenta";
-            btnSimularVenta.Size = new Size(120, 29);
-            btnSimularVenta.Text = "Ver resumen";
-            btnSimularVenta.UseVisualStyleBackColor = true;
-            btnSimularVenta.Click += Simular_Click;
+            btnConfirmarVenta.Location = new Point(230, 311);
+            btnConfirmarVenta.Name = "btnConfirmarVenta";
+            btnConfirmarVenta.Size = new Size(120, 29);
+            btnConfirmarVenta.Text = "Confirmar venta";
+            btnConfirmarVenta.UseVisualStyleBackColor = true;
+            btnConfirmarVenta.Click += ConfirmarVenta_Click;
             btnLimpiarVenta.Location = new Point(360, 311);
             btnLimpiarVenta.Name = "btnLimpiarVenta";
             btnLimpiarVenta.Size = new Size(105, 29);
@@ -201,7 +201,7 @@ namespace JaroniApp
             MinimumSize = new Size(640, 420);
             Name = "FormVentas";
             StartPosition = FormStartPosition.CenterParent;
-            Text = "JARONI | Ventas";
+            Text = "JARONI - PANEL DE VENTAS";
             panelVentas.ResumeLayout(false);
             panelVentas.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)nudCantidad).EndInit();

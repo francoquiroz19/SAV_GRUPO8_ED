@@ -10,10 +10,13 @@ namespace JaroniApp
     // Menú inicial que abre cada módulo en su propio formulario.
     public partial class FormPrincipal : Form
     {
-        public FormPrincipal()
+        private readonly EstadoAplicacion estado;
+
+        public FormPrincipal(EstadoAplicacion estado)
         {
             InitializeComponent();
-            Text = "JARONI | Gestión comercial";
+            this.estado = estado;
+            Text = "JARONI - PANEL PRINCIPAL DE GESTION COMECIAL";
             Size = new Size(600, 400);
             StartPosition = FormStartPosition.CenterScreen;
 
@@ -50,27 +53,27 @@ namespace JaroniApp
 
         private void AbrirProductos(object? sender, EventArgs e)
         {
-            new FormProductos().ShowDialog();
+            new FormProductos(estado).ShowDialog();
         }
 
         private void AbrirPedidos(object? sender, EventArgs e)
         {
-            new FormPedidos().ShowDialog();
+            new FormPedidos(estado).ShowDialog();
         }
 
         private void AbrirVentas(object? sender, EventArgs e)
         {
-            new FormVentas().ShowDialog(this);
+            new FormVentas(estado).ShowDialog(this);
         }
 
         private void AbrirClientes(object? sender, EventArgs e)
         {
-            new FormClientes().ShowDialog(this);
+            new FormClientes(estado).ShowDialog(this);
         }
 
         private void AbrirHistorial(object? sender, EventArgs e)
         {
-            new FormHistorial().ShowDialog();
+            new FormHistorial(estado).ShowDialog();
         }
     }
 }

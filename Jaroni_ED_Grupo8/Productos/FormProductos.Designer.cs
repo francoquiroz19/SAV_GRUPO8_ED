@@ -270,7 +270,7 @@ namespace Jaroni_ED_Grupo8
             this.Controls.Add(this.txtCodigo);
             this.Controls.Add(this.lblCodigo);
             this.Name = "FormProductos";
-            this.Text = "JARONI | Productos";
+            this.Text = "JARONI - PANEL DE INVENTARIO";
             ((System.ComponentModel.ISupportInitialize)(this.dgvInventario)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
