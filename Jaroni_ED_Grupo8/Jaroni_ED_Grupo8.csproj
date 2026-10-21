@@ -8,9 +8,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <!-- Conserva el archivo de trabajo sin compilar dos clases ListaProductos iguales. -->
-  <ItemGroup>
-    <Compile Remove="Productos/ListaProducto.cs" />
-  </ItemGroup>
-
 </Project>

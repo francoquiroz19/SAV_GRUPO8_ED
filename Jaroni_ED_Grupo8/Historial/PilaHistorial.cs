@@ -5,10 +5,10 @@ namespace Jaroni_ED_Grupo8
     // Un nodo guarda una venta y el enlace al registro que quedó debajo.
     public sealed class NodoPilaVenta
     {
-        public VentaHistorialDemo Dato { get; }
+        public VentaRegistrada Dato { get; }
         public NodoPilaVenta? Siguiente { get; set; }
 
-        public NodoPilaVenta(VentaHistorialDemo dato)
+        public NodoPilaVenta(VentaRegistrada dato)
         {
             Dato = dato;
         }
@@ -26,7 +26,7 @@ namespace Jaroni_ED_Grupo8
         public int Longitud => cantidad;
 
         // Coloca la venta más reciente encima del tope anterior.
-        public void Push(VentaHistorialDemo venta)
+        public void Push(VentaRegistrada venta)
         {
             // Primero enlazamos el nuevo nodo al antiguo tope; luego pasa a ser la cima.
             var nuevo = new NodoPilaVenta(venta);
@@ -36,7 +36,7 @@ namespace Jaroni_ED_Grupo8
         }
 
         // Retira únicamente el tope: el último registro en entrar sale primero.
-        public VentaHistorialDemo Pop()
+        public VentaRegistrada Pop()
         {
             if (tope is null)
                 throw new InvalidOperationException("La pila está vacía.");
@@ -49,7 +49,7 @@ namespace Jaroni_ED_Grupo8
         }
 
         // Lee el tope sin cambiar los enlaces ni la longitud.
-        public VentaHistorialDemo Top()
+        public VentaRegistrada Top()
         {
             if (tope is null)
                 throw new InvalidOperationException("La pila está vacía.");
@@ -65,7 +65,7 @@ namespace Jaroni_ED_Grupo8
             cantidad = 0;
         }
 
-        public void Recorrer(Action<VentaHistorialDemo> visitar)
+        public void Recorrer(Action<VentaRegistrada> visitar)
         {
             // La pila se recorre del tope a la base siguiendo Siguiente, sin desapilar.
             var actual = tope;

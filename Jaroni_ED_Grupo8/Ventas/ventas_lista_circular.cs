@@ -9,7 +9,11 @@ public sealed class VentasListaCircular<T>
     private VentasNodo<T>? cola;
 
     // El último enlaza con el primero; por eso cola.Siguiente es la cabeza.
-    public VentasNodo<T>? ObtenerCabeza() => cola?.Siguiente;
+    public VentasNodo<T>? ObtenerCabeza()
+    {
+        if (cola is null) return null;
+        return cola.Siguiente;
+    }
 
     // Inserta detrás de la cola y mantiene cerrado el círculo.
     public VentasNodo<T> InsertarAlFinal(T dato)
@@ -30,6 +34,7 @@ public sealed class VentasListaCircular<T>
         return nuevo;
     }
 
+    // El criterio se recibe desde Ventas porque T no tiene una propiedad Código.
     // Busca durante una vuelta completa sin usar la tabla como almacenamiento.
     public VentasNodo<T>? Buscar(Predicate<T> coincide)
     {
@@ -82,6 +87,7 @@ public sealed class VentasListaCircular<T>
         return false;
     }
 
+    // La acción indica qué hacer con cada dato; los enlaces permanecen en esta clase.
     public void Recorrer(Action<T> visitar)
     {
         if (cola is null) return;
@@ -99,8 +105,16 @@ public sealed class VentasListaCircular<T>
     // Cuenta los nodos mediante el mismo recorrido circular.
     public int ObtenerLongitud()
     {
-        var longitud = 0;
-        Recorrer(_ => longitud++);
+        if (cola is null) return 0;
+
+        int longitud = 0;
+        VentasNodo<T> primerNodo = cola.Siguiente;
+        VentasNodo<T> nodoActual = primerNodo;
+        do
+        {
+            longitud++;
+            nodoActual = nodoActual.Siguiente;
+        } while (nodoActual != primerNodo);
         return longitud;
     }
 

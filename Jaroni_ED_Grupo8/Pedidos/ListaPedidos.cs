@@ -7,8 +7,8 @@ namespace Jaroni_ED_Grupo8
     public class NodoPedido
     {
         public Pedido Dato { get; set; }
-        public NodoPedido Siguiente { get; set; }
-        public NodoPedido Anterior { get; set; }
+        public NodoPedido? Siguiente { get; set; }
+        public NodoPedido? Anterior { get; set; }
 
         // Crea el nodo sin vecinos hasta que se inserte en la lista.
         public NodoPedido(Pedido pedido)
@@ -19,13 +19,11 @@ namespace Jaroni_ED_Grupo8
         }
     }
 
-
-
     // Administra pedidos mediante una lista doblemente enlazada.
     public class ListaPedidos
     {
-        private NodoPedido cabeza;
-        private NodoPedido cola;
+        private NodoPedido? cabeza;
+        private NodoPedido? cola;
 
         // La lista comienza sin cabeza ni cola.
         public ListaPedidos()
@@ -48,16 +46,17 @@ namespace Jaroni_ED_Grupo8
             else
             {
                 // Enlaza la cola anterior con el nuevo nodo.
-                cola.Siguiente = nuevo;
+                // Si hay cabeza, también existe cola.
+                cola!.Siguiente = nuevo;
                 nuevo.Anterior = cola;
                 cola = nuevo;
             }
         }
 
         // Recorre desde la cabeza hasta encontrar el código.
-        public Pedido Buscar(int codigo)
+        public Pedido? Buscar(int codigo)
         {
-            NodoPedido actual = cabeza;
+            NodoPedido? actual = cabeza;
 
             while (actual != null)
             {
@@ -76,7 +75,7 @@ namespace Jaroni_ED_Grupo8
         // Cambia el estado del pedido encontrado sin mover sus enlaces.
         public bool ActualizarEstado(int codigo, string nuevoEstado)
         {
-            Pedido pedido = Buscar(codigo);
+            Pedido? pedido = Buscar(codigo);
 
             if (pedido == null)
             {
@@ -90,7 +89,7 @@ namespace Jaroni_ED_Grupo8
         // Recorre hacia adelante y escribe cada pedido en la consola.
         public void MostrarAdelante()
         {
-            NodoPedido actual = cabeza;
+            NodoPedido? actual = cabeza;
 
             while (actual != null)
             {
@@ -106,7 +105,7 @@ namespace Jaroni_ED_Grupo8
         // Recorre hacia atrás utilizando el enlace Anterior.
         public void MostrarAtras()
         {
-            NodoPedido actual = cola;
+            NodoPedido? actual = cola;
 
             while (actual != null)
             {
@@ -119,9 +118,20 @@ namespace Jaroni_ED_Grupo8
             }
         }
         // Permite acceder al primer nodo de la lista.
-        public NodoPedido ObtenerCabeza()
+        public NodoPedido? ObtenerCabeza()
         {
             return cabeza;
+        }
+
+        // La interfaz recorre los nodos desde la cabeza sin almacenar pedidos en la tabla.
+        public void Recorrer(Action<Pedido> visitar)
+        {
+            NodoPedido? actual = cabeza;
+            while (actual != null)
+            {
+                visitar(actual.Dato);
+                actual = actual.Siguiente;
+            }
         }
 
     }

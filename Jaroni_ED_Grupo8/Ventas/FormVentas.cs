@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using System.Windows.Forms;
 using Jaroni_ED_Grupo8;
 
@@ -8,33 +7,45 @@ namespace JaroniApp;
 // Gestiona en memoria los artículos de una venta mediante una lista circular.
 public partial class FormVentas : Form
 {
-    private readonly VentasListaCircular<VentasDetalle> detalleVenta = new();
+    private readonly EstadoAplicacion estado;
+    private readonly VentasListaCircular<VentasDetalle> detalleVenta;
     private VentasNodo<VentasDetalle>? articuloActual;
+    private bool registrandoVenta;
     private static readonly CultureInfo CulturaSoles = CultureInfo.GetCultureInfo("es-PE");
 
-    public FormVentas()
+    public FormVentas(EstadoAplicacion estado)
     {
+        this.estado = estado;
+        detalleVenta = estado.ArticulosVentaActual;
         InitializeComponent();
-        CargarProductosDemo();
+        CargarProductosRegistrados();
         ActualizarPresentacionVenta();
     }
 
-    private void CargarProductosDemo()
+    private void CargarProductosRegistrados()
     {
-        // Carga productos de ejemplo en memoria; no consulta ni altera Inventario.
-        cboProducto.Items.Add(new VentasProductoDemo("M001", "Mouse óptico", 35.90m));
-        cboProducto.Items.Add(new VentasProductoDemo("T001", "Teclado USB", 59.00m));
-        cboProducto.Items.Add(new VentasProductoDemo("I001", "Tinta negra", 48.50m));
-        cboProducto.Items.Add(new VentasProductoDemo("P001", "Papel A4 (paquete)", 24.90m));
-        cboProducto.SelectedIndex = 0;
+        // El selector muestra la lista compartida; no mantiene otro catálogo.
+        cboProducto.Items.Clear();
+        foreach (var producto in estado.ProductosRegistrados.ObtenerListaParaGrilla())
+            cboProducto.Items.Add(producto);
+
+        btnAgregarVenta.Enabled = cboProducto.Items.Count > 0;
+        if (btnAgregarVenta.Enabled)
+        {
+            lblAviso.Text = "Detalle de venta";
+            cboProducto.SelectedIndex = 0;
+        }
+        else
+            lblAviso.Text = "Registre productos en Productos antes de vender.";
     }
 
     // Muestra el precio del producto seleccionado, sin modificar el detalle.
     private void ActualizarPrecioVenta(object? sender, EventArgs e)
     {
-        txtPrecio.Text = cboProducto.SelectedItem is VentasProductoDemo producto
-            ? FormatearSoles(producto.PrecioUnitario)
-            : string.Empty;
+        if (cboProducto.SelectedItem is Producto producto)
+            txtPrecio.Text = FormatearSoles(producto.Precio);
+        else
+            txtPrecio.Clear();
     }
 
     private static string FormatearSoles(decimal importe) => "S/ " + importe.ToString("N2", CulturaSoles);
@@ -42,9 +53,17 @@ public partial class FormVentas : Form
     // Suma los subtotales recorriendo los artículos de la lista.
     private decimal CalcularTotalVenta()
     {
-        decimal total = 0;
-        detalleVenta.Recorrer(articulo => total += articulo.Subtotal);
-        return total;
+        VentasNodo<VentasDetalle>? primerNodo = detalleVenta.ObtenerCabeza();
+        if (primerNodo is null) return 0;
+
+        decimal totalVenta = 0;
+        VentasNodo<VentasDetalle> nodoActual = primerNodo;
+        do
+        {
+            totalVenta += nodoActual.Dato.Subtotal;
+            nodoActual = nodoActual.Siguiente;
+        } while (nodoActual != primerNodo);
+        return totalVenta;
     }
 
     // Reconstruye la tabla y destaca el nodo actualmente seleccionado.
@@ -52,17 +71,28 @@ public partial class FormVentas : Form
     {
         dgvDetalle.Rows.Clear();
         // La tabla se reconstruye desde los nodos; no guarda el detalle de la venta.
-        detalleVenta.Recorrer(articulo =>
+        VentasNodo<VentasDetalle>? primerNodo = detalleVenta.ObtenerCabeza();
+        if (primerNodo is not null)
         {
-            var indice = dgvDetalle.Rows.Add(articulo.Nombre, articulo.Cantidad,
-                FormatearSoles(articulo.PrecioUnitario), FormatearSoles(articulo.Subtotal));
-            dgvDetalle.Rows[indice].Tag = articulo.Codigo;
-        });
+            VentasNodo<VentasDetalle> nodoActual = primerNodo;
+            do
+            {
+                VentasDetalle articulo = nodoActual.Dato;
+                int fila = dgvDetalle.Rows.Add(articulo.Nombre, articulo.Cantidad,
+                    FormatearSoles(articulo.PrecioUnitario), FormatearSoles(articulo.Subtotal));
+                dgvDetalle.Rows[fila].Tag = articulo.Codigo;
+                nodoActual = nodoActual.Siguiente;
+            } while (nodoActual != primerNodo);
+        }
 
         lblTotalValor.Text = "Total: " + FormatearSoles(CalcularTotalVenta());
-        lblActual.Text = articuloActual is null
-            ? "Artículo actual: ninguno"
-            : "Artículo actual: " + articuloActual.Dato.Nombre + (volvioAlPrimero ? " (volvió al primero)" : "");
+        if (articuloActual is null)
+            lblActual.Text = "Artículo actual: ninguno";
+        else
+        {
+            lblActual.Text = "Artículo actual: " + articuloActual.Dato.Nombre;
+            if (volvioAlPrimero) lblActual.Text += " (volvió al primero)";
+        }
 
         dgvDetalle.ClearSelection();
         if (articuloActual is null) return;
@@ -78,14 +108,18 @@ public partial class FormVentas : Form
     // Inserta un artículo o acumula su cantidad si ya existe en la lista.
     private void Agregar_Click(object? sender, EventArgs e)
     {
-        if (cboProducto.SelectedItem is not VentasProductoDemo producto ||
-            nudCantidad.Value < 1 || nudCantidad.Value != decimal.Truncate(nudCantidad.Value))
+        if (cboProducto.SelectedItem is not Producto producto)
         {
-            MessageBox.Show(this, "Seleccione un producto y una cantidad entera positiva.", "Ventas", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show(this, "Seleccione un producto.", "Ventas", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        if (nudCantidad.Value < 1 || nudCantidad.Value != decimal.Truncate(nudCantidad.Value))
+        {
+            MessageBox.Show(this, "Ingrese una cantidad entera positiva.", "Ventas", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
-        var cantidad = decimal.ToInt32(nudCantidad.Value);
+        int cantidad = decimal.ToInt32(nudCantidad.Value);
         // Buscar recorre los nodos; agregar el mismo código acumula en su artículo.
         var existente = detalleVenta.Buscar(articulo => articulo.Codigo == producto.Codigo);
         try
@@ -123,7 +157,12 @@ public partial class FormVentas : Form
         var retirado = detalleVenta.Buscar(articulo => articulo.Codigo == codigo);
         if (retirado is null) return;
         if (retirado == articuloActual)
-            articuloActual = retirado.Siguiente == retirado ? null : retirado.Siguiente;
+        {
+            if (retirado.Siguiente == retirado)
+                articuloActual = null;
+            else
+                articuloActual = retirado.Siguiente;
+        }
 
         detalleVenta.Eliminar(articulo => articulo.Codigo == codigo);
         ActualizarPresentacionVenta();
@@ -140,32 +179,133 @@ public partial class FormVentas : Form
         }
 
         // El avance usa el enlace del nodo: tras la cola vuelve a la cabeza.
-        var siguiente = articuloActual?.Siguiente ?? cabeza;
-        var volvioAlPrimero = articuloActual is not null && siguiente == cabeza && articuloActual != cabeza;
+        VentasNodo<VentasDetalle> siguiente;
+        if (articuloActual is null)
+            siguiente = cabeza;
+        else
+            siguiente = articuloActual.Siguiente;
+        bool volvioAlPrimero = articuloActual is not null && siguiente == cabeza && articuloActual != cabeza;
         articuloActual = siguiente;
         ActualizarPresentacionVenta(volvioAlPrimero);
     }
 
-    // Presenta un resumen sin registrar la venta ni alterar el inventario.
-    private void Simular_Click(object? sender, EventArgs e)
+    // Confirma el detalle circular, descuenta stock y conserva una copia registrada.
+    private void ConfirmarVenta_Click(object? sender, EventArgs e)
     {
-        if (detalleVenta.ObtenerCabeza() is null)
+        if (registrandoVenta) return;
+        VentasNodo<VentasDetalle>? primerNodo = detalleVenta.ObtenerCabeza();
+        if (primerNodo is null)
         {
-            MessageBox.Show(this, "Agregue al menos un artículo para ver el resumen.", "Ventas", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show(this, "Agregue al menos un artículo antes de confirmar.", "Ventas", MessageBoxButtons.OK, MessageBoxIcon.Information);
             return;
         }
 
-        var resumen = new StringBuilder("Resumen de venta:\n\n");
-        detalleVenta.Recorrer(articulo => resumen.AppendLine($"{articulo.Cantidad} × {articulo.Nombre}: {FormatearSoles(articulo.Subtotal)}"));
-        resumen.AppendLine($"\nTotal: {FormatearSoles(CalcularTotalVenta())}");
-        resumen.AppendLine("\nEste resumen no registra la venta ni modifica el inventario.");
-        MessageBox.Show(this, resumen.ToString(), "Resumen de venta", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        registrandoVenta = true;
+        btnConfirmarVenta.Enabled = false;
+        // finally reactiva el botón incluso si se cancela el cuadro de confirmación.
+        try
+        {
+            string resumen = "Confirmar venta:\n\n";
+            VentasNodo<VentasDetalle> nodoActual = primerNodo;
+            do
+            {
+                VentasDetalle articulo = nodoActual.Dato;
+                resumen += $"{articulo.Cantidad} × {articulo.Nombre}: {FormatearSoles(articulo.Subtotal)}\n";
+                nodoActual = nodoActual.Siguiente;
+            } while (nodoActual != primerNodo);
+            resumen += "\nTotal: " + FormatearSoles(CalcularTotalVenta());
+            if (MessageBox.Show(this, resumen, "Confirmar venta",
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            if (!RegistrarVentaActual(out var ventaRegistrada, out var error))
+            {
+                MessageBox.Show(this, error, "Ventas", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            MessageBox.Show(this, $"Venta {ventaRegistrada!.Codigo} registrada en esta sesión.",
+                "Ventas", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        finally
+        {
+            registrandoVenta = false;
+            btnConfirmarVenta.Enabled = true;
+        }
     }
 
-    // Vacía el detalle en preparación y conserva el catálogo inicial.
+    // Validatodo el detalle antes de descontar; la venta se guarda solo si todos los descuentos terminan
+    private bool RegistrarVentaActual(out VentaRegistrada? ventaRegistrada, out string? error)
+    {
+        ventaRegistrada = null;
+        error = null;
+        VentasNodo<VentasDetalle>? primerNodo = detalleVenta.ObtenerCabeza();
+        if (primerNodo is null)
+        {
+            error = "No hay artículos para registrar.";
+            return false;
+        }
+
+        // Primero revisamos todos los nodos. No se descuenta nada si falta stock.
+        VentasNodo<VentasDetalle> nodoActual = primerNodo;
+        do
+        {
+            VentasDetalle articulo = nodoActual.Dato;
+            Producto? productoEncontrado = estado.ProductosRegistrados.Buscar(articulo.Codigo);
+            if (productoEncontrado is null || articulo.Cantidad <= 0 ||
+                productoEncontrado.Cantidad < articulo.Cantidad)
+            {
+                error = $"No hay existencias suficientes para {articulo.Nombre}.";
+                return false;
+            }
+            nodoActual = nodoActual.Siguiente;
+        } while (nodoActual != primerNodo);
+
+        // El registro copia los artículos antes de vaciar la lista editable.
+        try
+        {
+            ventaRegistrada = new VentaRegistrada(estado.TomarCodigoVenta(), DateTime.Now, detalleVenta);
+        }
+        catch (OverflowException)
+        {
+            error = "La cantidad o el total excede el límite permitido.";
+            return false;
+        }
+
+        // Descontamos después de validar toda la venta.
+        nodoActual = primerNodo;
+        do
+        {
+            VentasDetalle articulo = nodoActual.Dato;
+            if (!estado.ProductosRegistrados.RegistrarSalida(articulo.Codigo, articulo.Cantidad))
+            {
+                // Si falló un descuento, devolvemos las unidades de los nodos anteriores.
+                VentasNodo<VentasDetalle> nodoRestaurar = primerNodo;
+                while (nodoRestaurar != nodoActual)
+                {
+                    VentasDetalle descontado = nodoRestaurar.Dato;
+                    estado.ProductosRegistrados.RegistrarEntrada(descontado.Codigo, descontado.Cantidad);
+                    nodoRestaurar = nodoRestaurar.Siguiente;
+                }
+                ventaRegistrada = null;
+                error = "No se pudo completar la venta. El inventario no cambió.";
+                return false;
+            }
+            nodoActual = nodoActual.Siguiente;
+        } while (nodoActual != primerNodo);
+
+        estado.VentasRegistradas.Agregar(ventaRegistrada);
+        estado.VentasPendientesRevision.Push(ventaRegistrada);
+        detalleVenta.Vaciar();
+        articuloActual = null;
+        nudCantidad.Value = 1;
+        ActualizarPresentacionVenta();
+        return true;
+    }
+
+    // Vacía solamente el detalle en preparación; no afecta ventas confirmadas.
     private void LimpiarVenta_Click(object? sender, EventArgs e)
     {
-        // Limpiar descarta solo el detalle circular; el catálogo demo permanece.
+        // El catálogo sigue proviniendo de la lista compartida de Productos.
         detalleVenta.Vaciar();
         articuloActual = null;
         nudCantidad.Value = 1;

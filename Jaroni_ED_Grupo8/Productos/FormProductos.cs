@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Windows.Forms;
 
 namespace Jaroni_ED_Grupo8
@@ -6,13 +7,14 @@ namespace Jaroni_ED_Grupo8
     // Permite consultar y mantener productos almacenados en la lista enlazada.
     public partial class FormProductos : Form
     {
-        // Lista enlazada que almacena los productos del inventario.
-        private ListaProductos listaProductos = new ListaProductos();
+        // Conserva la misma lista de inventario al cerrar y reabrir el formulario.
+        private readonly ListaProductos listaProductos;
 
         // Constructor del formulario.
-        public FormProductos()
+        public FormProductos(EstadoAplicacion estado)
         {
             InitializeComponent();
+            listaProductos = estado.ProductosRegistrados;
 
             // Configura la tabla del inventario.
             dgvInventario.AutoGenerateColumns = true;
@@ -31,22 +33,37 @@ namespace Jaroni_ED_Grupo8
             dgvInventario.DataSource =
                 listaProductos.ObtenerListaParaGrilla();
         }
+
+        // Acepta coma o punto decimal sin interpretar la coma como separador de millares.
+        private static bool LeerPrecio(string texto, out decimal precio)
+        {
+            string valor = texto.Trim().Replace(',', '.');
+            return decimal.TryParse(valor, NumberStyles.AllowLeadingSign | NumberStyles.AllowDecimalPoint,
+                CultureInfo.InvariantCulture, out precio);
+        }
+
         // Registra un producto nuevo.
         private void btnRegistrar_Click(object sender, EventArgs e)
         {
-            int cantidad;
-            decimal precio;
-
-            if (!int.TryParse(txtCantidad.Text, out cantidad) ||
-                !decimal.TryParse(txtPrecio.Text, out precio))
+            if (string.IsNullOrWhiteSpace(txtCodigo.Text) || string.IsNullOrWhiteSpace(txtNombre.Text))
             {
-                MessageBox.Show("Ingresa una cantidad y un precio válidos.");
+                MessageBox.Show("Ingrese el código y el nombre del producto.");
+                return;
+            }
+            if (!int.TryParse(txtCantidad.Text, out int cantidad) || cantidad < 0)
+            {
+                MessageBox.Show("Ingrese una cantidad no negativa.");
+                return;
+            }
+            if (!LeerPrecio(txtPrecio.Text, out decimal precio) || precio <= 0)
+            {
+                MessageBox.Show("Ingrese un precio mayor que cero.");
                 return;
             }
 
             Producto producto = new Producto(
-                txtCodigo.Text,
-                txtNombre.Text,
+                txtCodigo.Text.Trim(),
+                txtNombre.Text.Trim(),
                 txtCategoria.Text,
                 cantidad,
                 precio,
@@ -67,7 +84,7 @@ namespace Jaroni_ED_Grupo8
         // Busca un producto por su código.
         private void btnBuscar_Click(object sender, EventArgs e)
         {
-            Producto producto = listaProductos.Buscar(txtCodigo.Text);
+            Producto? producto = listaProductos.Buscar(txtCodigo.Text.Trim());
 
             if (producto == null)
             {
@@ -85,17 +102,20 @@ namespace Jaroni_ED_Grupo8
         // Actualiza los datos de un producto.
         private void btnActualizar_Click(object sender, EventArgs e)
         {
-            decimal precio;
-
-            if (!decimal.TryParse(txtPrecio.Text, out precio))
+            if (string.IsNullOrWhiteSpace(txtNombre.Text))
             {
-                MessageBox.Show("Ingresa un precio válido.");
+                MessageBox.Show("Ingrese el nombre del producto.");
+                return;
+            }
+            if (!LeerPrecio(txtPrecio.Text, out decimal precio) || precio <= 0)
+            {
+                MessageBox.Show("Ingrese un precio mayor que cero.");
                 return;
             }
 
             if (listaProductos.Actualizar(
-                txtCodigo.Text,
-                txtNombre.Text,
+                txtCodigo.Text.Trim(),
+                txtNombre.Text.Trim(),
                 txtCategoria.Text,
                 precio,
                 txtUbicacion.Text))

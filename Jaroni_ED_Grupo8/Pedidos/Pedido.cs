@@ -9,6 +9,7 @@ namespace Jaroni_ED_Grupo8
         public int Codigo { get; set; }
         public string Cliente { get; set; }
         public string Productos { get; set; }
+        public int Cantidad { get; set; }
         public DateTime Fecha { get; set; }
         public string Estado { get; set; }
 
@@ -21,6 +22,12 @@ namespace Jaroni_ED_Grupo8
             Fecha = fecha;
 
             Estado = "Pendiente";
+        }
+
+        public Pedido(int codigo, string cliente, string productos, DateTime fecha, int cantidad)
+            : this(codigo, cliente, productos, fecha)
+        {
+            Cantidad = cantidad;
         }
     }
 }

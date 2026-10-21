@@ -6,7 +6,7 @@ namespace Jaroni_ED_Grupo8
     public class ListaProductos
     {
         // La cabeza señala el primer producto; null indica lista vacía.
-        private NodoProducto cabeza;
+        private NodoProducto? cabeza;
 
         public ListaProductos()
         {
@@ -16,6 +16,10 @@ namespace Jaroni_ED_Grupo8
         // Inserta al final, después de comprobar que el código no exista.
         public bool Registrar(Producto producto)
         {
+            if (string.IsNullOrWhiteSpace(producto.Codigo)) return false;
+            if (string.IsNullOrWhiteSpace(producto.Nombre)) return false;
+            if (producto.Cantidad < 0) return false;
+            if (producto.Precio <= 0) return false;
             if (Buscar(producto.Codigo) != null) return false;
             NodoProducto nuevo = new NodoProducto(producto);
             if (cabeza == null) cabeza = nuevo;
@@ -29,9 +33,9 @@ namespace Jaroni_ED_Grupo8
         }
 
         // Recorre los enlaces hasta hallar el código solicitado.
-        public Producto Buscar(string codigo)
+        public Producto? Buscar(string codigo)
         {
-            NodoProducto actual = cabeza;
+            NodoProducto? actual = cabeza;
             while (actual != null)
             {
                 if (actual.Dato.Codigo == codigo) return actual.Dato;
@@ -43,13 +47,13 @@ namespace Jaroni_ED_Grupo8
         // Modifica los datos del producto encontrado sin reemplazar su nodo.
         public bool Actualizar(string codigo, string nuevoNombre, string nuevaCategoria, decimal nuevoPrecio, string nuevaUbicacion)
         {
-            Producto p = Buscar(codigo);
-            if (p != null)
+            Producto? productoEncontrado = Buscar(codigo);
+            if (productoEncontrado != null && !string.IsNullOrWhiteSpace(nuevoNombre) && nuevoPrecio > 0)
             {
-                p.Nombre = nuevoNombre;
-                p.Categoria = nuevaCategoria;
-                p.Precio = nuevoPrecio;
-                p.Ubicacion = nuevaUbicacion;
+                productoEncontrado.Nombre = nuevoNombre;
+                productoEncontrado.Categoria = nuevaCategoria;
+                productoEncontrado.Precio = nuevoPrecio;
+                productoEncontrado.Ubicacion = nuevaUbicacion;
                 return true;
             }
             return false;
@@ -80,10 +84,11 @@ namespace Jaroni_ED_Grupo8
         // Incrementa la cantidad de un producto existente.
         public bool RegistrarEntrada(string codigo, int cantidad)
         {
-            Producto p = Buscar(codigo);
-            if (p != null && cantidad > 0)
+            Producto? productoEncontrado = Buscar(codigo);
+            if (productoEncontrado != null && cantidad > 0 &&
+                productoEncontrado.Cantidad <= int.MaxValue - cantidad)
             {
-                p.Cantidad += cantidad;
+                productoEncontrado.Cantidad += cantidad;
                 return true;
             }
             return false;
@@ -92,11 +97,11 @@ namespace Jaroni_ED_Grupo8
         // Descuenta unidades solo cuando la cantidad disponible alcanza.
         public bool RegistrarSalida(string codigo, int cantidad)
         {
-            Producto p = Buscar(codigo);
-            if (p != null && cantidad > 0)
+            Producto? productoEncontrado = Buscar(codigo);
+            if (productoEncontrado != null && cantidad > 0)
             {
-                if (p.Cantidad - cantidad < 0) return false;
-                p.Cantidad -= cantidad;
+                if (productoEncontrado.Cantidad < cantidad) return false;
+                productoEncontrado.Cantidad -= cantidad;
                 return true;
             }
             return false;
@@ -106,7 +111,7 @@ namespace Jaroni_ED_Grupo8
         public List<Producto> ObtenerListaParaGrilla()
         {
             List<Producto> lista = new List<Producto>();
-            NodoProducto actual = cabeza;
+            NodoProducto? actual = cabeza;
             while (actual != null)
             {
                 lista.Add(actual.Dato);
@@ -119,7 +124,7 @@ namespace Jaroni_ED_Grupo8
         public List<Producto> ObtenerBajoStock(int umbralMinimo)
         {
             List<Producto> listaBajoStock = new List<Producto>();
-            NodoProducto actual = cabeza;
+            NodoProducto? actual = cabeza;
             while (actual != null)
             {
                 if (actual.Dato.Cantidad <= umbralMinimo)

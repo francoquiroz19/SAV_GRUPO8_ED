@@ -1,15 +1,14 @@
 using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
-using JaroniApp;
 
 namespace Jaroni_ED_Grupo8
 {
     // Muestra las ventas pendientes almacenadas en una pila enlazada.
     public class FormHistorial : Form
     {
-        private const int RegistrosIniciales = 10;
-        private readonly PilaHistorial historial = new();
+        private readonly EstadoAplicacion estado;
+        private readonly PilaHistorial historial;
         private static readonly CultureInfo CulturaSoles = CultureInfo.GetCultureInfo("es-PE");
 
         private readonly DataGridView tabla = new();
@@ -20,17 +19,19 @@ namespace Jaroni_ED_Grupo8
         private readonly Label lblUltima = new();
         private readonly Label lblCantidad = new();
         private readonly Label lblRevisadas = new();
+        private readonly Label lblRegistradas = new();
         private readonly Label lblEstado = new();
 
-        public FormHistorial()
+        public FormHistorial(EstadoAplicacion estado)
         {
-            Text = "Historial de ventas";
+            this.estado = estado;
+            historial = estado.VentasPendientesRevision;
+            Text = "JARONI - PANEL DEL HISTORIAL DE VENTAS";
             Size = new Size(780, 570);
             MinimumSize = new Size(780, 570);
             StartPosition = FormStartPosition.CenterParent;
 
             InicializarControles();
-            CargarVentasIniciales();
             ActualizarPresentacion();
         }
 
@@ -65,7 +66,7 @@ namespace Jaroni_ED_Grupo8
             tabla.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Código", FillWeight = 12F });
             tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Fecha y hora", FillWeight = 23F });
-            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Producto", FillWeight = 25F });
+            tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Productos", FillWeight = 25F });
             tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Cantidad", FillWeight = 12F });
             tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Precio unitario", FillWeight = 15F });
             tabla.Columns.Add(new DataGridViewTextBoxColumn { HeaderText = "Total", FillWeight = 13F });
@@ -91,7 +92,12 @@ namespace Jaroni_ED_Grupo8
             lblRevisadas.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
             Controls.Add(lblRevisadas);
 
-            lblEstado.Location = new Point(20, 472);
+            lblRegistradas.Location = new Point(20, 472);
+            lblRegistradas.Size = new Size(250, 23);
+            lblRegistradas.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            Controls.Add(lblRegistradas);
+
+            lblEstado.Location = new Point(20, 500);
             lblEstado.Size = new Size(720, 23);
             lblEstado.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             Controls.Add(lblEstado);
@@ -107,37 +113,28 @@ namespace Jaroni_ED_Grupo8
             Controls.Add(boton);
         }
 
-        // Carga diez registros fijos para la revisión en memoria.
-        private void CargarVentasIniciales()
-        {
-            // Diez Push en orden cronológico: V010 termina en el tope de la pila.
-            // Las fechas son fijas; actualizar la tabla no cambia los registros.
-            historial.Push(new VentaHistorialDemo("V001", new DateTime(2026, 9, 1, 9, 0, 0), "Mouse óptico", 1, 35.90m));
-            historial.Push(new VentaHistorialDemo("V002", new DateTime(2026, 9, 2, 9, 0, 0), "Teclado", 2, 60.00m));
-            historial.Push(new VentaHistorialDemo("V003", new DateTime(2026, 9, 3, 9, 0, 0), "Tinta para impresora", 1, 45.00m));
-            historial.Push(new VentaHistorialDemo("V004", new DateTime(2026, 9, 4, 9, 0, 0), "Papel bond A4", 3, 25.00m));
-            historial.Push(new VentaHistorialDemo("V005", new DateTime(2026, 9, 5, 9, 0, 0), "Memoria USB", 2, 30.00m));
-            historial.Push(new VentaHistorialDemo("V006", new DateTime(2026, 9, 6, 9, 0, 0), "Cuaderno A4", 4, 10.00m));
-            historial.Push(new VentaHistorialDemo("V007", new DateTime(2026, 9, 7, 9, 0, 0), "Lapicero azul", 5, 2.50m));
-            historial.Push(new VentaHistorialDemo("V008", new DateTime(2026, 9, 8, 9, 0, 0), "Cable HDMI", 1, 28.00m));
-            historial.Push(new VentaHistorialDemo("V009", new DateTime(2026, 9, 9, 9, 0, 0), "Cartucho de tinta", 2, 75.00m));
-            historial.Push(new VentaHistorialDemo("V010", new DateTime(2026, 9, 10, 9, 0, 0), "Audífonos", 1, 85.00m));
-        }
-
         // Refleja el estado de la pila en la tabla y en los indicadores.
         private void ActualizarPresentacion()
         {
             tabla.Rows.Clear();
             // La grilla se reconstruye recorriendo los nodos desde el tope hacia la base.
-            historial.Recorrer(venta => tabla.Rows.Add(venta.Codigo,
-                venta.FechaHora.ToString("dd/MM/yyyy HH:mm:ss"), venta.Producto,
-                venta.Cantidad, Soles(venta.PrecioUnitario), Soles(venta.Total)));
+            historial.Recorrer(venta =>
+            {
+                string precio = "Varios";
+                if (venta.PrecioUnitario.HasValue)
+                    precio = Soles(venta.PrecioUnitario.Value);
+                tabla.Rows.Add(venta.Codigo, venta.FechaHora.ToString("dd/MM/yyyy HH:mm:ss"),
+                    venta.Productos, venta.CantidadTotal, precio, Soles(venta.Total));
+            });
 
-            lblUltima.Text = historial.EstaVacia
-                ? "Última venta pendiente: Ninguna"
-                : "Última venta pendiente: " + historial.Top().Codigo;
+            if (historial.EstaVacia)
+                lblUltima.Text = "Última venta pendiente: Ninguna";
+            else
+                lblUltima.Text = "Última venta pendiente: " + historial.Top().Codigo;
             lblCantidad.Text = "Ventas pendientes de revisión: " + historial.Longitud;
-            lblRevisadas.Text = "Ventas revisadas en esta sesión: " + (RegistrosIniciales - historial.Longitud);
+            lblRevisadas.Text = "Ventas revisadas en esta sesión: " + estado.VentasRevisadasEnSesion;
+            lblRegistradas.Text = "Ventas registradas: " + estado.VentasRegistradas.Longitud;
+            btnReiniciar.Enabled = estado.VentasRegistradas.Longitud > 0;
             tabla.ClearSelection();
         }
 
@@ -152,10 +149,13 @@ namespace Jaroni_ED_Grupo8
             }
 
             // Top solo consulta: la venta continúa en la cima y Longitud no cambia.
-            var ultima = historial.Top();
-            MessageBox.Show(this,
-                $"Código: {ultima.Codigo}\nProducto: {ultima.Producto}\nCantidad: {ultima.Cantidad}\nTotal: {Soles(ultima.Total)}",
-                "Última venta pendiente", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            VentaRegistrada ultima = historial.Top();
+            string resumen = $"Código: {ultima.Codigo}\nFecha: {ultima.FechaHora:dd/MM/yyyy HH:mm}\n";
+            ultima.RecorrerArticulos(articulo =>
+                resumen += $"{articulo.Cantidad} × {articulo.Nombre} — {Soles(articulo.PrecioUnitario)}\n");
+            resumen += "Total: " + Soles(ultima.Total);
+            MessageBox.Show(this, resumen, "Última venta pendiente",
+                MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         // Marca como revisada solo la venta situada en el tope.
@@ -169,6 +169,7 @@ namespace Jaroni_ED_Grupo8
 
             // Pop solo retira el tope de esta pila temporal; no anula una venta real ni toca Inventario.
             var retirada = historial.Pop();
+            estado.RegistrarRevision();
             ActualizarPresentacion();
             lblEstado.Text = $"Venta {retirada.Codigo} revisada y retirada de pendientes.";
         }
@@ -178,23 +179,23 @@ namespace Jaroni_ED_Grupo8
         {
             // Recorrer lee cada nodo desde el tope sin modificar la pila.
             ActualizarPresentacion();
-            lblEstado.Text = historial.EstaVacia
-                ? "No hay ventas pendientes de revisión."
-                : $"Se muestran {historial.Longitud} ventas pendientes, de la más reciente a la más antigua.";
+            if (historial.EstaVacia)
+                lblEstado.Text = "No hay ventas pendientes de revisión.";
+            else
+                lblEstado.Text = $"Se muestran {historial.Longitud} ventas pendientes, de la más reciente a la más antigua.";
         }
 
-        // Vacía y vuelve a cargar los registros iniciales para repetir la revisión.
+        // Reconstruye pendientes solo con ventas confirmadas en esta sesión.
         private void BtnReiniciar_Click(object? sender, EventArgs e)
         {
-            if (MessageBox.Show(this, "¿Restaurar los 10 registros iniciales y reiniciar la revisión?",
+            if (MessageBox.Show(this, "¿Volver a marcar como pendientes las ventas registradas en esta sesión?",
                     "Confirmar reinicio", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 
-            // Clear evita duplicados; los diez registros vuelven a entrar mediante Push.
-            historial.Clear();
-            CargarVentasIniciales();
+            // Clear y Push restauran las ventas reales sin duplicarlas en el registro general.
+            estado.ReiniciarRevision();
             ActualizarPresentacion();
-            lblEstado.Text = "Revisión reiniciada: las 10 ventas vuelven a estar pendientes.";
+            lblEstado.Text = "Revisión reiniciada con las ventas registradas en esta sesión.";
         }
     }
 }
